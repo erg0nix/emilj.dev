@@ -1,0 +1,23 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import { projects } from '../../data/projects';
+
+export function getStaticPaths() {
+  return projects.flatMap((project) => project.article ? [{
+    params: { slug: project.name },
+    props: { project, article: project.article },
+  }] : []);
+}
+
+interface Props {
+  project: (typeof projects)[number];
+  article: NonNullable<(typeof projects)[number]['article']>;
+}
+const { project, article } = Astro.props;
+---
+
+<ArticleLayout title={project.name} summary={project.description} backHref="/#projects" backLabel="Back to projects">
+  <span slot="meta">{project.detail}</span>
+  <h2>{article.heading}</h2>
+  {article.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+</ArticleLayout>

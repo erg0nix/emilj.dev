@@ -1,0 +1,27 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import { notes } from '../../data/notes';
+
+export function getStaticPaths() {
+  return notes.map((note) => ({
+    params: { slug: note.slug },
+    props: { note },
+  }));
+}
+
+interface Props {
+  note: (typeof notes)[number];
+}
+const { note } = Astro.props;
+---
+
+<ArticleLayout
+  title={note.title}
+  summary={note.summary}
+  backHref="/#notes"
+  backLabel="Back to notes"
+>
+  <time slot="meta" datetime={note.date}>{note.label}</time>
+  <h2>{note.heading}</h2>
+  {note.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+</ArticleLayout>
