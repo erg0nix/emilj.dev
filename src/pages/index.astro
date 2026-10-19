@@ -1,395 +1,137 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
+import SeasonalArt from '../components/SeasonalArt.astro';
+import Icon from '../components/Icon.astro';
 import { notes } from '../data/notes';
 import { projects } from '../data/projects';
 ---
 
 <SiteLayout>
-  <section class="hero" aria-labelledby="intro-title">
-    <div class="hero-grid" aria-hidden="true"></div>
-    <div class="hero-atmosphere" aria-hidden="true"></div>
-    <div class="ambient" aria-hidden="true"></div>
-    <div class="season-art">
-      <button class="season-trigger" type="button" aria-label="Stir the leaves" disabled>
-        <svg class="season-mark" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" shape-rendering="crispEdges">
-          <defs>
-            <path id="season-autumn" d="M7 0h1v1H7ZM6 1h3v1H6ZM6 2h3v1H6ZM2 3h1v1H2ZM6 3h3v1H6ZM12 3h1v1H12ZM2 4h2v1H2ZM6 4h3v1H6ZM11 4h2v1H11ZM2 5h3v1H2ZM6 5h3v1H6ZM10 5h3v1H10ZM2 6h11v1H2ZM3 7h9v1H3ZM0 8h2v1H0ZM4 8h7v1H4ZM13 8h2v1H13ZM0 9h15v1H0ZM1 10h13v1H1ZM2 11h11v1H2ZM3 12h9v1H3ZM5 13h5v1H5ZM7 14h1v1H7ZM7 15h1v1H7Z" transform="scale(1.5)" />
-            <path id="season-winter" d="M7 0h1v1H7ZM7 1h1v1H7ZM2 2h1v1H2ZM7 2h1v1H7ZM12 2h1v1H12ZM3 3h1v1H3ZM7 3h1v1H7ZM11 3h1v1H11ZM4 4h1v1H4ZM7 4h1v1H7ZM10 4h1v1H10ZM5 5h1v1H5ZM7 5h1v1H7ZM9 5h1v1H9ZM6 6h3v1H6ZM0 7h15v1H0ZM6 8h3v1H6ZM5 9h1v1H5ZM7 9h1v1H7ZM9 9h1v1H9ZM4 10h1v1H4ZM7 10h1v1H7ZM10 10h1v1H10ZM3 11h1v1H3ZM7 11h1v1H7ZM11 11h1v1H11ZM2 12h1v1H2ZM7 12h1v1H7ZM12 12h1v1H12ZM7 13h1v1H7ZM7 14h1v1H7Z" transform="translate(.75 .75) scale(1.5)" />
-            <g id="season-spring"><path d="M9 1h6v2h2v5h-2v2H9V8H7V3h2ZM3 7h5v2h2v6H8v2H3v-2H1V9h2Zm13 0h5v2h2v6h-2v2h-5v-2h-2V9h2ZM9 14h6v2h2v5h-2v2H9v-2H7v-5h2Z"/><path d="M10 9h4v1h1v4h-1v1h-4v-1H9v-4h1Z" fill="#f3cf79"/></g>
-            <path id="season-summer" d="M11 0h2v4h-2ZM4 3h2v2h2v2H6V5H4Zm14 0h2v2h-2v2h-2V5h2ZM8 6h8v2h2v8h-2v2H8v-2H6V8h2ZM0 11h4v2H0Zm20 0h4v2h-4ZM6 17h2v2H6v2H4v-2h2Zm10 0h2v2h2v2h-2v-2h-2Zm-5 3h2v4h-2Z" />
-          </defs>
-          <use href="#season-autumn" />
-        </svg>
-      </button>
-      <svg aria-hidden="true" class="season-mark season-mark-small" viewBox="0 0 24 24" fill="currentColor" shape-rendering="crispEdges"><use href="#season-autumn" /></svg>
-      <svg aria-hidden="true" class="season-mark season-mark-tiny" viewBox="0 0 24 24" fill="currentColor" shape-rendering="crispEdges"><use href="#season-autumn" /></svg>
+  <section class="hero-field" aria-labelledby="intro-title">
+    <SeasonalArt />
+    <div class="page-width hero-content">
+      <h1 id="intro-title">Software engineer.<br /><span>Curious by default.</span></h1>
+      <div class="intro-bottom">
+        <p>I build backend systems, agents, and tools.<br />A few things I’m making, and what I’m learning<br class="desktop-break" /> along the way.</p>
+        <div class="hero-socials" aria-label="Social links">
+          <a class="social-button" href="https://github.com/erg0nix"><Icon name="github" /><span>GitHub</span></a>
+        </div>
+      </div>
     </div>
-    <div class="hero-intro">
-      <h1 id="intro-title">Hi, I’m Emil<span class="season-dot">.</span></h1>
-      <p>This is where I keep the things I’m building and the things I’m learning.</p>
-      <a class="text-link" href="#projects">Browse projects</a>
-    </div>
+    <div class="hero-edge" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
   </section>
-  <div class="content-frame">
-    <section class="projects" id="projects" aria-labelledby="projects-title">
-      <div class="section-heading">
-        <h2 id="projects-title">Things I’m building or vibing</h2>
-        <a href="https://github.com/erg0nix?tab=repositories">More on GitHub</a>
-      </div>
-      <div class="project-list">
-        {projects.map((project) => (
-          <article class="project" data-project={project.name}>
-            <div class="project-copy">
-              <span class="project-detail">{project.detail}</span>
-              <h3><a href={project.href}>{project.name}</a></h3>
-              <p>{project.description}</p>
-            </div>
-            <a class="project-art" href={project.href} aria-label={project.article ? `Read about ${project.name}` : `View ${project.name} on GitHub`}>
-              {project.name === 'kontekst' ? (
-                <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true" fill="none">
-                  <path class="art-grid" d="M0 45h320M0 90h320M0 135h320M70 0v180M115 0v180M160 0v180M205 0v180M250 0v180" />
-                  <g class="file-back">
-                    <rect x="91" y="35" width="128" height="94" rx="6" />
-                  </g>
-                  <g class="file-front">
-                    <rect x="103" y="49" width="128" height="96" rx="6" />
-                    <path d="M103 69h128" />
-                  </g>
-                  <path d="M114 59h4m4 0h4m4 0h4M118 86l8 7-8 7m15 0h16" stroke="#ff7629" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-                  <path d="M118 116h66m-66 11h45" class="art-guide" />
-                </svg>
-              ) : project.name === 'display-mcp' ? (
-                <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true" fill="none">
-                  <path class="art-grid" d="M0 45h320M0 90h320M0 135h320M70 0v180M115 0v180M160 0v180M205 0v180M250 0v180" />
-                  <g class="file-front">
-                    <rect x="94" y="39" width="132" height="94" rx="6" />
-                    <path d="M94 59h132m-66 74v14m-21 0h42" />
-                  </g>
-                  <path d="M105 49h4m4 0h4m4 0h4" stroke="#ff7629" stroke-width="3" />
-                  <path d="M110 115V91h14v24Zm24 0V80h14v35Zm24 0V99h14v16Zm24 0V72h14v43Z" fill="#ff7629" />
-                  <path d="m111 83 28-14 26 16 33-20" class="art-guide" />
-                </svg>
-              ) : project.name === 'pumpkin-pi' ? (
-                <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true" fill="none">
-                  <path class="art-grid" d="M0 45h320M0 90h320M0 135h320M70 0v180M115 0v180M160 0v180M205 0v180M250 0v180" />
-                  <g shape-rendering="crispEdges">
-                    <path d="M151 37h18v12h-6v18h-12z" fill="#7b753d" />
-                    <path d="M126 61h18v-6h32v6h18v12h12v54h-12v12h-18v6h-32v-6h-18v-12h-12V73h12z" fill="#ff7629" />
-                    <path d="M138 67h12v66h-12v-12h-6V79h6z" fill="#ffac5e" />
-                    <path d="M168 61h12v12h6v54h-6v12h-12v-12h6V73h-6z" fill="#e15417" />
-                    <path d="M150 73h6v54h-6z" fill="#ffc781" />
-                  </g>
-                  <path class="art-guide" d="M70 83v14m-7-7h14m173-7v14m-7-7h14" />
-                </svg>
-              ) : project.name === 'aselekt' ? (
-                <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true" fill="none" stroke-linejoin="round">
-                  <path class="art-grid" d="M0 45h320M0 90h320M0 135h320M70 0v180M115 0v180M160 0v180M205 0v180M250 0v180" />
-                  <g class="file-back" transform="rotate(-12 145 95)">
-                    <rect x="104" y="42" width="80" height="104" rx="5" />
-                    <path d="M119 64h35m-35 12h49m-49 12h39m-39 12h44" />
-                  </g>
-                  <g class="file-front" transform="rotate(8 177 92)">
-                    <path d="M139 38h53l22 22v77a5 5 0 0 1-5 5h-70a5 5 0 0 1-5-5V43a5 5 0 0 1 5-5Z" />
-                    <path d="M192 38v22h22M149 78h47m-47 12h35m-35 12h43" />
-                  </g>
-                  <rect x="190" y="111" width="29" height="29" rx="7" fill="#ff7629" />
-                  <path d="m198 125 5 5 9-11" stroke="#fff8ef" stroke-width="2.5" stroke-linecap="round" />
-                  <path class="art-guide" d="M70 83v14m-7-7h14m173-7v14m-7-7h14" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true" fill="none">
-                  <path class="art-grid" d="M0 45h320M0 90h320M0 135h320M70 0v180M115 0v180M160 0v180M205 0v180M250 0v180" />
-                  <g class="file-front">
-                    <rect x="104" y="43" width="112" height="96" rx="6" />
-                    <path d="M104 63h112" />
-                  </g>
-                  <path d="M114 52h4m4 0h4m4 0h4" stroke="#ff7629" stroke-width="3" />
-                  <path d="M148 78h24v8h-24zM140 86h8v8h-8zM172 86h8v8h-8zM140 94h40v8h-40zM140 102h8v8h-8zM148 110h32v8h-32z" fill="#ff7629" shape-rendering="crispEdges" />
-                </svg>
-              )}
-            </a>
-          </article>
-        ))}
-        {projects.length % 2 !== 0 && (
-          <div class="project project-placeholder">
-            <p id="next-project-message">More coming soon.</p>
-          </div>
-        )}
-      </div>
-    </section>
-  </div>
-  <section class="content-frame notes" id="notes" aria-labelledby="notes-title">
-    <div class="notes-intro">
-      <h2 id="notes-title">Notes</h2>
-      <p>Projects, ideas, and whatever else comes to mind.</p>
+  <div class="interest-strip">
+    <div class="page-width">
+      <p>Local-first software <i aria-hidden="true"></i> Agent tooling <i aria-hidden="true"></i> Graphics &amp; simulation</p>
     </div>
-    <ol class="post-list">
-      {notes.map((post) => (
-        <li class="post">
-          <a class="post-link" href={`/notes/${post.slug}/`}>
-            <time datetime={post.date}>{post.label}</time>
-            <h3>{post.title}</h3>
+  </div>
+  <section class="projects-section page-width" id="projects" aria-labelledby="projects-title">
+    <div class="projects-heading"><h2 id="projects-title">Projects</h2></div>
+    <ol class="project-rows">
+      {projects.map(project => (
+        <li>
+          <a class="project-row" href={project.href}>
+            <span class="row-symbol"><Icon name={project.name} /></span>
+            <div class="row-name"><h3>{project.name}</h3><span>{project.detail}</span></div>
+            <p>{project.description}</p>
           </a>
         </li>
       ))}
     </ol>
   </section>
-  <script is:inline slot="scripts">
-    const nextProjectMessage = document.getElementById('next-project-message');
-    if (nextProjectMessage) {
-      const messages = [
-        'More coming soon.',
-        'Room for another idea.',
-        'The next idea goes here.',
-        'Something else will land here.',
-      ];
-      nextProjectMessage.textContent = messages[Math.floor(Math.random() * messages.length)];
-    }
-
-    const root = document.documentElement;
-    const hero = document.querySelector('.hero');
-    const artwork = document.querySelector('.season-art');
-    const trigger = document.querySelector('.season-trigger');
-    const mark = trigger.querySelector('.season-mark');
-    const ambient = document.querySelector('.ambient');
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const activeAnimations = new Set();
-    let visible = true;
-    let season;
-    let symbol;
-    let viewBox;
-    let lastBurst = -Infinity;
-
-    const clearBursts = () => {
-      activeAnimations.forEach((animation) => animation.cancel());
-      activeAnimations.clear();
-      hero.querySelectorAll('.hero-burst').forEach((particle) => particle.remove());
-    };
-    const updateMotion = () => {
-      const running = !reducedMotion.matches && !document.hidden && visible;
-      root.dataset.motion = running ? 'running' : 'paused';
-      if (reducedMotion.matches) clearBursts();
-      activeAnimations.forEach((animation) => running ? animation.play() : animation.pause());
-    };
-    const updateSeason = () => {
-      season = root.dataset.season;
-      clearBursts();
-      artwork.style.removeProperty('--parallax-x');
-      artwork.style.removeProperty('--parallax-y');
-      document.querySelectorAll('.season-mark use').forEach((use) => {
-        use.setAttribute('href', `#season-${season}`);
-      });
-      const labels = {
-        winter: 'Stir the snow',
-        spring: 'Send a few petals',
-        summer: 'A little sunshine',
-        autumn: 'Stir the leaves',
-      };
-      trigger.setAttribute('aria-label', labels[season]);
-      trigger.title = labels[season];
-      symbol = season === 'summer'
-        ? '<path d="M4 0h2v4h4v2H6v4H4V6H0V4h4Z" fill="currentColor"/>'
-        : season === 'spring'
-          ? '<path d="M4 0h4v2h2v4H8v2H4V6H2V2h2Z" fill="currentColor"/>'
-          : `<use href="#season-${season}" fill="currentColor"/>`;
-      viewBox = season === 'summer' || season === 'spring' ? '0 0 10 10' : '0 0 24 24';
-      ambient.replaceChildren();
-      for (let i = 0; i < (season === 'winter' ? 16 : 10); i++) {
-        const mote = document.createElement('span');
-        mote.className = 'mote';
-        const size = season === 'summer' ? 3 + i % 3 : season === 'winter' ? 4 + i % 5 : 7 + i % 6;
-        const duration = season === 'summer' ? 5 + i % 5 : 13 + i % 9;
-        mote.style.cssText = `left:${43 + i * 31 % 54}%;--top:${12 + i * 17 % 76}%;width:${size}px;height:${size}px;--duration:${duration}s;--delay:-${i * 2.7}s`;
-        mote.innerHTML = `<svg viewBox="${viewBox}" aria-hidden="true">${symbol}</svg>`;
-        ambient.append(mote);
-      }
-    };
-    updateSeason();
-    updateMotion();
-    trigger.disabled = false;
-    document.addEventListener('seasonchange', updateSeason);
-    reducedMotion.addEventListener('change', updateMotion);
-    document.addEventListener('visibilitychange', updateMotion);
-    new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      updateMotion();
-    }).observe(hero);
-
-    trigger.addEventListener('click', () => {
-      if (root.dataset.motion !== 'running' || performance.now() - lastBurst < 600) return;
-      lastBurst = performance.now();
-      const heroRect = hero.getBoundingClientRect();
-      const markRect = trigger.getBoundingClientRect();
-      const x = markRect.x + markRect.width / 2 - heroRect.x;
-      const y = markRect.y + markRect.height / 2 - heroRect.y;
-      const spin = mark.animate([
-        { transform: 'rotate(0) scale(1)' },
-        { transform: `rotate(${season === 'summer' ? 50 : -12}deg) scale(1.12)`, offset: .35 },
-        { transform: `rotate(${season === 'summer' ? 90 : 0}deg) scale(1)` },
-      ], { duration: 650, easing: 'cubic-bezier(.2,.8,.2,1)' });
-      activeAnimations.add(spin);
-      spin.addEventListener('finish', () => activeAnimations.delete(spin), { once: true });
-      for (let i = 0; i < 12; i++) {
-        const particle = document.createElement('span');
-        particle.className = 'hero-burst';
-        particle.setAttribute('aria-hidden', 'true');
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
-        particle.innerHTML = `<svg viewBox="${viewBox}">${symbol}</svg>`;
-        hero.append(particle);
-        const angle = i / 12 * Math.PI * 2;
-        const distance = 70 + Math.random() * 70;
-        const animation = particle.animate([
-          { transform: 'translate(-5px,-5px) scale(.3)', opacity: 0 },
-          { opacity: .85, offset: .15 },
-          { transform: `translate(${Math.cos(angle) * distance}px,${Math.sin(angle) * distance + 40}px) rotate(${i * 35}deg) scale(.7)`, opacity: 0 },
-        ], { duration: 1100 + Math.random() * 400, easing: 'cubic-bezier(.1,.5,.2,1)', fill: 'both' });
-        activeAnimations.add(animation);
-        animation.addEventListener('finish', () => {
-          particle.remove();
-          activeAnimations.delete(animation);
-        }, { once: true });
-      }
-    });
-    hero.addEventListener('pointermove', (event) => {
-      if (event.pointerType !== 'mouse' || root.dataset.motion !== 'running') return;
-      const rect = hero.getBoundingClientRect();
-      artwork.style.setProperty('--parallax-x', `${((event.clientX - rect.left) / rect.width - .5) * 12}px`);
-      artwork.style.setProperty('--parallax-y', `${((event.clientY - rect.top) / rect.height - .5) * 8}px`);
-    });
-    hero.addEventListener('pointerleave', () => {
-      artwork.style.removeProperty('--parallax-x');
-      artwork.style.removeProperty('--parallax-y');
-    });
-  </script>
+  <section class="notes-section page-width" id="notes" aria-labelledby="notes-title">
+    <h2 id="notes-title">Notes</h2>
+    <ol class="note-entries">
+      {notes.map(note => (
+        <li class="note-entry">
+          <a href={`/notes/${note.slug}/`}>
+            <span class="row-symbol"><Icon name="note" /></span>
+            <h3>{note.title}</h3>
+            <time datetime={note.date}>{note.label}</time>
+            <p>{note.summary}</p>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </section>
 </SiteLayout>
 
 <style>
-  .hero { --accent: var(--hero-text); --hero-bleed: clamp(32px, calc((100vw - 1200px) / 2 - 8px), 80px); position: relative; isolation: isolate; overflow: hidden; margin-top: 24px; margin-inline: calc(-1 * var(--hero-bleed)); padding: 80px var(--hero-bleed); color: var(--hero-text); background: var(--hero); border: 1px solid var(--hero-line); border-radius: 20px; }
-  .hero-grid { position: absolute; inset: 0; z-index: -1; opacity: .32; background-image: radial-gradient(var(--motif) .8px, transparent .8px); background-size: 6px 6px; mask-image: linear-gradient(120deg, transparent 25%, #000 100%); }
-  .hero-intro { position: relative; max-width: 430px; }
-  .hero a { color: inherit; }
-  h1 { margin: 0 0 18px; font-size: clamp(36px, 4.2vw, 52px); line-height: 1.1; letter-spacing: -1.5px; font-weight: 600; }
-  .season-dot { color: var(--motif); }
-  .hero-intro p { max-width: 370px; margin: 0 0 24px; color: var(--hero-copy); }
-  .text-link { font-weight: 600; }
-  .season-art { transform: translate(var(--parallax-x, 0px), var(--parallax-y, 0px)); transition: transform 700ms cubic-bezier(.2,.8,.2,1); position: absolute; inset-block: 0; right: 8%; width: 34%; pointer-events: none; z-index: -1; }
-  .season-mark { position: absolute; width: 150px; left: 48%; top: 21%; color: var(--motif); rotate: -22deg; filter: drop-shadow(8px 10px 0 var(--motif-shadow)); overflow: visible; }
-  .season-mark-small { width: 82px; left: 10%; top: 55%; rotate: 27deg; opacity: .65; }
-  .season-mark-tiny { width: 38px; left: 22%; top: 12%; rotate: -12deg; opacity: .45; }
-  .content-frame { --frame-padding: 32px; position: relative; margin: 78px calc(-1 * var(--frame-padding)) 0; border: 1px solid var(--border); }
-  .content-frame::before, .content-frame::after { content: ''; position: absolute; top: -3px; width: 5px; height: 5px; background: var(--page); border: 1px solid var(--divider); pointer-events: none; }
-  .content-frame::before { left: -3px; }
-  .content-frame::after { right: -3px; }
-  .section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 26px var(--frame-padding); border-bottom: 1px solid var(--border); }
-  h2 { font-size: 22px; line-height: 1.3; font-weight: 600; letter-spacing: -.5px; margin: 0; }
-  .project-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .project { display: grid; grid-template-columns: minmax(0, 1fr) clamp(112px, 14vw, 180px); align-items: center; gap: 24px; padding: 32px var(--frame-padding) 36px; border-bottom: 1px solid var(--border); }
-  .project:nth-child(odd) { border-right: 1px solid var(--border); }
-  .project:nth-last-child(-n + 2) { border-bottom: 0; }
-  .project-placeholder { display: flex; justify-content: center; text-align: center; min-height: 160px; }
-  .project h3 { margin: 6px 0 10px; font-size: 20px; font-weight: 600; letter-spacing: -.3px; }
-  .project p { max-width: 410px; margin: 0; color: var(--muted); }
-  .project-detail { display: block; color: var(--muted); }
-  .project-art { display: grid; place-items: center; height: clamp(144px, 14vw, 180px); overflow: hidden; background: var(--art-surface); border-radius: 8px; }
-  .project-art svg { display: block; height: 100%; width: 100%; transition: transform 450ms cubic-bezier(.2,.9,.25,1.3); }
-  @media (hover: hover) {
-    .project-art:hover svg { transform: translateY(-4px) rotate(-2deg); }
-    .project[data-project='aselekt'] .project-art:hover .file-front { translate: 4px -3px; }
-    .project[data-project='aselekt'] .project-art:hover .file-back { translate: -3px 2px; }
-  }
-  .art-grid { stroke: var(--art-grid); stroke-width: .7; }
-  .art-guide { stroke: var(--art-stroke); stroke-width: 1; opacity: .65; }
-  .file-front, .file-back { transition: translate 400ms cubic-bezier(.2,.8,.2,1); }
-  .project-art:focus-visible svg { transform: translateY(-4px) rotate(-2deg); }
-  .project:not([data-project='pumpkin-pi']) [fill='#ff7629'] { fill: var(--season-end); }
-  .project:not([data-project='pumpkin-pi']) [stroke='#ff7629'] { stroke: var(--season-end); }
-  .file-back { fill: var(--art-surface); stroke: var(--art-stroke); stroke-width: 1.5; }
-  .file-front { fill: var(--art-paper); stroke: var(--art-stroke); stroke-width: 1.5; }
-  .notes { display: grid; grid-template-columns: 1fr 2fr; margin-top: 48px; }
-  .notes-intro { padding: 36px var(--frame-padding); }
-  .notes-intro p { max-width: 24ch; margin: 14px 0 0; color: var(--muted); }
-  .post-list { list-style: none; margin: 0; padding: 16px calc(var(--frame-padding) - 12px); border-left: 1px solid var(--border); }
-  .post-link { transition: background-color 140ms ease, color 140ms ease; display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 24px; align-items: baseline; padding: 20px 12px; border-radius: 8px; text-decoration: none; }
-  .post-link:hover, .post-link:focus-visible { background: var(--surface-hover); }
-  .post-link:focus-visible { outline-offset: 2px; border-radius: 8px; }
-  .post time { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .post h3 { margin: 0; font-size: 14px; font-weight: 500; line-height: 1.65; text-decoration: underline; text-underline-offset: 4px; }
-  .season-trigger { position: absolute; padding: 0; border: 0; background: none; width: 174px; height: 174px; left: calc(48% - 12px); top: calc(21% - 12px); display: grid; place-items: center; pointer-events: auto; cursor: pointer; border-radius: 50%; }
-  .season-trigger > .season-mark { position: static; width: 150px; transform-origin: center; transition: transform 500ms cubic-bezier(.2,.9,.25,1.3); }
-  .season-trigger:hover > .season-mark, .season-trigger:focus-visible > .season-mark { transform: rotate(8deg) scale(1.045); }
-  .season-trigger:focus-visible { outline-color: var(--motif); }
-  :global(html[data-season='summer']) .season-trigger > .season-mark { rotate: 0deg; }
-  :global(html[data-season='winter']) .season-trigger > .season-mark { rotate: -10deg; }
-  :global(html[data-season='summer']) .season-mark-small { opacity: .38; }
-  :global(html[data-season='summer']) .season-mark-tiny { opacity: .22; }
-  .ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
-  .ambient :global(.mote) { position: absolute; top: -28px; color: var(--particle); opacity: 0; animation: snow-fall var(--duration) linear var(--delay) infinite paused; }
-  .ambient :global(.mote svg) { width: 100%; height: 100%; display: block; }
-  :global(:root[data-season='spring']) .ambient :global(.mote) { animation-name: petal-fall; }
-  :global(:root[data-season='autumn']) .ambient :global(.mote) { animation-name: leaf-fall; opacity: .3; }
-  :global(:root[data-season='summer']) .ambient :global(.mote) { top: var(--top); animation: firefly var(--duration) ease-in-out var(--delay) infinite paused; }
-  :global(:root[data-season='summer']) .ambient :global(.mote svg) { filter: drop-shadow(0 0 3px var(--particle)); }
-  @keyframes snow-fall { 0% { opacity: 0; transform: translate(0, 0) rotate(0); } 10%,85% { opacity: .65; } 50% { transform: translate(18px, 180px) rotate(30deg); } 100% { opacity: 0; transform: translate(-8px, 410px) rotate(65deg); } }
-  @keyframes petal-fall { 0% { opacity: 0; transform: translate(0, 0) rotate(0); } 10%,85% { opacity: .55; } 45% { transform: translate(-25px, 170px) rotate(65deg); } 100% { opacity: 0; transform: translate(28px, 410px) rotate(200deg); } }
-  @keyframes leaf-fall { 0% { opacity: 0; transform: translate(0, 0) rotate(-20deg); } 15%,80% { opacity: .28; } 50% { transform: translate(50px, 200px) rotate(80deg); } 100% { opacity: 0; transform: translate(-20px, 420px) rotate(180deg); } }
-  @keyframes firefly { 0%,100% { opacity: 0; transform: translate(0,0); } 30% { opacity: .65; } 60% { opacity: .15; transform: translate(16px,-22px); } 75% { opacity: .8; } 90% { opacity: .15; transform: translate(-10px,-38px); } }
-  .hero-atmosphere { position: absolute; pointer-events: none; inset: -20% -10% -30% 35%; z-index: -2; opacity: .55; animation: atmosphere-drift 20s ease-in-out infinite alternate paused; }
-  :global(:root[data-season='winter']) .hero-atmosphere { background: radial-gradient(ellipse at 65% 72%, #a2fff445, transparent 43%), radial-gradient(ellipse at 28% 22%, #aa90ff35, transparent 45%); }
-  :global(:root[data-season='winter'][data-theme='dark']) .hero-atmosphere { background: conic-gradient(from 220deg at 50% 120%, transparent 0deg, #66e9c250 32deg, transparent 49deg, #b3a0ff45 70deg, transparent 105deg); opacity: .75; filter: blur(15px); }
-  :global(:root[data-season='spring']) .hero-atmosphere { background: radial-gradient(ellipse at 50% 30%, #fffcdb65, transparent 54%); }
-  :global(:root[data-season='summer']) .hero-atmosphere { background: repeating-conic-gradient(from 210deg at 70% 0%, transparent 0deg 14deg, #fff6c325 15deg 22deg, transparent 23deg 35deg); opacity: .45; }
-  @keyframes atmosphere-drift { from { transform: translate(-2%,2%) rotate(-4deg); } to { transform: translate(5%,-4%) rotate(5deg); } }
-  .hero :global(.hero-burst) { position: absolute; width: 10px; height: 10px; color: var(--spark); pointer-events: none; z-index: 2; }
-  .hero :global(.hero-burst svg) { width: 100%; height: 100%; }
+  .hero-field { position:relative; isolation:isolate; min-height:590px; overflow:hidden; border-bottom:1px solid var(--line); }
+  .hero-content { position:relative; z-index:1; padding-top:79px; padding-bottom:74px; pointer-events:none; }
+  .hero-content a { pointer-events:auto; }
+  h1 { font-size:clamp(44px,5.8vw,80px); line-height:1.04; font-weight:500; letter-spacing:-3.9px; margin:0; }
+  h1 span { color:var(--muted); }
+  .intro-bottom { margin-top:31px; }
+  .intro-bottom p { margin:0; color:var(--muted); font-size:15px; line-height:1.75; }
+  .hero-socials { display:flex; flex-wrap:wrap; gap:12px; margin-top:25px; }
+  .social-button { display:inline-flex; align-items:center; gap:10px; min-height:44px; padding:9px 16px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text); text-decoration:none; }
+  .social-button :global(svg) { width:20px; height:20px; }
+  .social-button:hover { background:var(--raised); }
+  .hero-edge { position:absolute; inset:auto 0 0; height:10px; display:flex; justify-content:space-between; padding-inline:8.33%; pointer-events:none; }
+  .hero-edge span { height:10px; border-left:1px solid var(--line); }
+  .interest-strip { border-bottom:1px solid var(--fine); }
+  .interest-strip .page-width { display:flex; align-items:center; justify-content:flex-start; min-height:60px; }
+  .interest-strip p { display:flex; gap:24px; align-items:center; justify-content:flex-start; text-align:left; margin:0; color:var(--muted); }
+  .interest-strip i { width:3px; height:3px; background:var(--subtle); }
 
-  :global(:root[data-motion='running']) .ambient :global(.mote), :global(:root[data-motion='running']) .hero-atmosphere { animation-play-state: running; }
-  :global(:root[data-motion='paused']) .season-art { transform: none; transition: none; }
-  .season-trigger:disabled { cursor: default; }
-  @media (max-width: 800px) {
-    .season-trigger { width: 134px; height: 134px; }
-    .season-trigger > .season-mark { width: 110px; }
-    .hero { --hero-bleed: 20px; padding-block: 56px; }
-    .season-art { right: 3%; width: 30%; }
-    .season-mark { width: 110px; }
-    .season-mark-small { width: 60px; }
-    .season-mark-tiny { width: 28px; }
-    .hero-intro { max-width: 60%; }
-    .content-frame { --frame-padding: 20px; }
-    .project { grid-template-columns: minmax(0, 1fr) 112px; gap: 20px; }
-    .project-art { height: 144px; }
-    .notes { grid-template-columns: 1fr; }
-    .notes-intro { padding-block: 28px; }
-    .notes-intro p { max-width: none; }
-    .post-list { border-left: 0; border-top: 1px solid var(--border); padding-block: 8px; }
+  .projects-section { padding-block:48px 40px; }
+  .projects-heading { margin-bottom:12px; }
+  h2 { margin:0; font-size:22px; font-weight:500; letter-spacing:-.5px; line-height:1.3; }
+  .project-rows { display:grid; gap:4px; list-style:none; padding:0; margin:0 -12px; max-width:864px; }
+  .project-row, .note-entry { --item-highlight:var(--surface); background:transparent; border-radius:8px; }
+  :global(:root[data-theme='light']) .project-row, :global(:root[data-theme='light']) .note-entry { --item-highlight:var(--raised); }
+  .project-row:hover, .project-row:focus-visible, .note-entry:hover, .note-entry:focus-within { background:var(--item-highlight); }
+  .project-row { display:grid; grid-template-columns:20px max-content minmax(0,1fr); align-items:baseline; gap:4px 16px; min-height:44px; padding:12px; color:var(--text); text-decoration:none; }
+  .project-row:focus-visible { outline-offset:3px; }
+  .row-symbol { display:grid; place-items:center; align-self:start; padding-top:2px; color:var(--muted); }
+  .row-symbol :global(svg) { width:20px; height:20px; }
+  .row-name { display:flex; align-items:baseline; gap:16px; }
+  .row-name h3 { margin:0; color:var(--accent); font-size:inherit; font-weight:500; line-height:1.3; letter-spacing:-.3px; }
+  .row-name span { color:var(--subtle); white-space:nowrap; }
+  .project-row p { margin:0; color:var(--muted); line-height:1.6; }
+  .notes-section { padding:0 0 80px; }
+  .note-entries { display:grid; gap:4px; list-style:none; padding:0; margin:12px -12px 0; width:calc(100% + 24px); max-width:664px; }
+  .note-entry h3 { margin:0; font-size:inherit; font-weight:400; line-height:1.4; }
+  .note-entry a { display:grid; grid-template-columns:20px max-content max-content minmax(0,1fr); align-items:baseline; gap:4px 16px; padding:12px; border-radius:inherit; color:var(--accent); text-decoration:none; }
+  .note-entry time { color:var(--subtle); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .note-entry p { margin:0; color:var(--muted); }
+
+  @media (min-width:1600px) {
+    .hero-field { min-height:640px; }
+    .hero-content { padding-top:100px; }
+    h1 { font-size:86px; }
   }
-  @media (max-width: 700px) {
-    .project-list { grid-template-columns: 1fr; }
-    .project:nth-child(n) { border-right: 0; border-bottom: 0; }
-    .project + .project { border-top: 1px solid var(--border); }
+  @media (max-width:1100px) {
+    h1 { letter-spacing:-2.7px; }
+    .hero-content { padding-top:70px; }
   }
-  @media (max-width: 560px) {
-    .season-trigger { width: 124px; height: 124px; left: auto; right: -12px; top: -2px; }
-    .season-trigger > .season-mark { width: 100px; }
-    .ambient :global(.mote:nth-child(n+8)) { display: none; }
-    .hero-atmosphere { opacity: .3; }
-    .hero { --hero-bleed: 14px; margin-top: 16px; padding-block: 48px; border-radius: 15px; }
-    .hero-intro { max-width: 100%; }
-    .hero-intro p { max-width: 280px; }
-    .season-art { right: -12px; top: auto; bottom: -25px; height: 140px; width: 130px; opacity: .45; }
-    .season-mark { width: 100px; left: auto; right: 0; top: 10px; }
-    .season-mark-small, .season-mark-tiny { display: none; }
-    .content-frame { --frame-padding: 14px; margin-top: 54px; }
-    .section-heading { align-items: flex-start; flex-direction: column; gap: 12px; padding-block: 24px; }
-    .project { grid-template-columns: minmax(0, 1fr) clamp(80px, 24vw, 112px); gap: 16px; padding-block: 24px 30px; }
-    .project-art { height: 112px; }
-    .post-link { grid-template-columns: 1fr; gap: 4px; padding-block: 16px; }
+  @media (max-width:760px) {
+    .hero-field { min-height:620px; }
+    .hero-content { padding-top:56px; padding-bottom:0; }
+    h1 { font-size:clamp(40px,7.5vw,57px); letter-spacing:-2.3px; }
+    .intro-bottom { margin-top:25px; }
+    .intro-bottom p { font-size:14px; }
+    .interest-strip .page-width { padding-block:15px; }
+    .interest-strip p { gap:14px; }
+    .notes-section { padding-bottom:48px; }
+    .projects-section { padding-block:32px; }
+    .project-row { grid-template-columns:20px minmax(0,1fr); gap:4px 12px; }
+    .row-symbol { grid-column:1; grid-row:1; }
+    .row-name { grid-column:2; flex-wrap:wrap; gap:4px 12px; }
+    .project-row p { grid-column:2; }
+    .note-entry a { column-gap:12px; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .ambient { display: none; }
-    .hero-atmosphere { animation: none; }
-    .season-art, .season-trigger > .season-mark, .project-art svg, .file-front, .file-back, .post-link { transition: none; }
-    .season-art, .season-trigger:hover > .season-mark, .season-trigger:focus-visible > .season-mark, .project-art:hover svg, .project-art:focus-visible svg { transform: none; }
-    .project[data-project='aselekt'] .project-art:hover .file-front, .project[data-project='aselekt'] .project-art:hover .file-back { translate: none; }
+  @media (max-width:560px) {
+    .hero-field { min-height:650px; }
+    .hero-content { padding-top:43px; }
+    h1 { font-size:clamp(33px,8.7vw,48px); letter-spacing:-1.6px; }
+    .desktop-break { display:none; }
+    .intro-bottom p { max-width:34ch; }
+    .hero-socials { margin-top:18px; }
+    .interest-strip p { gap:10px; flex-wrap:wrap; }
+    .note-entry a { grid-template-columns:20px max-content minmax(0,1fr); }
+    .note-entry p { grid-column:2 / -1; grid-row:2; }
+    .note-entry time { grid-column:3; grid-row:1; }
   }
 </style>
