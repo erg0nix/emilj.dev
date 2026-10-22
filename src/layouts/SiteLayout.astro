@@ -1,6 +1,4 @@
 ---
-import Icon from '../components/Icon.astro';
-
 interface Props {
   title?: string;
   description?: string;
@@ -9,13 +7,6 @@ const {
   title = 'emilj.dev',
   description = "Emil's personal website. Projects, notes, and other things.",
 } = Astro.props;
-const seasonOptions = [
-  ['auto', 'Automatic'],
-  ['winter', 'Winter'],
-  ['spring', 'Spring'],
-  ['summer', 'Summer'],
-  ['autumn', 'Autumn'],
-];
 ---
 
 <!doctype html>
@@ -132,55 +123,19 @@ const seasonOptions = [
   </head>
   <body id="top">
     <a class="skip-link" href="#main">Skip to content</a>
-    <div class="masthead">
-      <div class="page-width">
-        <header class="header">
-          <a class="home-link" href="/" aria-label="emilj.dev, home">
-            <svg class="logo-wordmark" viewBox="0 0 150 44" aria-hidden="true">
-              <text x="1" y="31" fill="var(--text)" font-family="Arial,Helvetica,sans-serif" font-size="30" font-weight="600" letter-spacing="-1.1">emilj<tspan fill="currentColor">.</tspan><tspan font-weight="400">dev</tspan></text>
-            </svg>
-          </a>
-          <div class="header-controls">
-            <nav aria-label="Main navigation">
-              <a href="/#projects">Projects</a>
-              <a href="/#notes">Notes</a>
-            </nav>
-            <details class="season-picker" hidden>
-              <summary aria-label="Season: Automatic" title="Season: Automatic"><Icon name="auto" /></summary>
-              <div class="season-options" role="group" aria-label="Season">
-                {seasonOptions.map(([value, label]) => (
-                  <button type="button" data-season-choice={value} aria-label={label} title={label} aria-pressed={value === 'auto'}>
-                    <Icon name={value} />
-                  </button>
-                ))}
-              </div>
-            </details>
-            <button id="theme" class="theme-toggle" type="button" role="switch" aria-label="Dark mode" aria-checked="true" hidden>
-              <svg class="sun" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" />
-              </svg>
-              <svg class="moon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.5 13a8.5 8.5 0 0 1-9.5-9.5A8.5 8.5 0 1 0 20.5 13Z" />
-              </svg>
-            </button>
-          </div>
-        </header>
-      </div>
-    </div>
     <main id="main"><slot /></main>
   </body>
 </html>
 
 <style is:global>
   :root { color-scheme:dark; --bg:#090b0d; --surface:#101315; --raised:#171b1e; --text:#eceeef; --muted:#979fa6; --subtle:#768087; --line:#23292d; --fine:#1a2024; --accent:#e79c60; --art:225,140,73; }
-  :root[data-theme='light'] { color-scheme:light; --bg:#f5f5f1; --surface:#eeefeb; --raised:#fafbf7; --text:#20292d; --muted:#56646d; --subtle:#64717a; --line:#d2d8d6; --fine:#e1e5e1; --accent:#99501b; }
+  :root[data-theme='light'] { color-scheme:light; --bg:#e8e7e2; --surface:#dfe1da; --raised:#efeee8; --text:#20292d; --muted:#56646d; --subtle:#64717a; --line:#c9cfc9; --fine:#d7dad2; --accent:#99501b; --art:165,91,37; }
   :root[data-season='winter'] { --accent:#9cc9e5; --art:139,192,224; }
   :root[data-season='spring'] { --accent:#dba7bc; --art:212,158,182; }
   :root[data-season='summer'] { --accent:#dbc37e; --art:213,184,105; }
-  :root[data-season='winter'][data-theme='light'] { --accent:#28628b; }
-  :root[data-season='spring'][data-theme='light'] { --accent:#954164; }
-  :root[data-season='summer'][data-theme='light'] { --accent:#796019; }
+  :root[data-season='winter'][data-theme='light'] { --accent:#28628b; --art:50,106,143; }
+  :root[data-season='spring'][data-theme='light'] { --accent:#954164; --art:145,76,109; }
+  :root[data-season='summer'][data-theme='light'] { --accent:#796019; --art:130,105,42; }
   * { box-sizing:border-box; }
   html { scroll-behavior:smooth; scroll-padding-top:32px; }
   body { margin:0; background:var(--bg); color:var(--text); font:14px/1.6 Arial,Helvetica,sans-serif; -webkit-font-smoothing:antialiased; }
@@ -194,36 +149,11 @@ const seasonOptions = [
   ::selection { color:var(--bg); background:var(--accent); }
   [hidden] { display:none!important; }
   .page-width { width:min(1200px, calc(100% - 96px)); margin-inline:auto; }
-  .masthead { border-bottom:1px solid var(--fine); }
-  .header { display:flex; justify-content:space-between; align-items:center; min-height:96px; gap:24px; }
-  .home-link { display:inline-flex; align-items:center; min-height:44px; }
-  .logo-wordmark { display:block; width:150px; height:auto; color:var(--accent); }
-  .header-controls { display:flex; align-items:center; gap:4px; border:1px solid var(--line); padding:4px; border-radius:12px; }
-  .header nav { display:flex; align-items:center; gap:4px; }
-  .header nav a { display:flex; align-items:center; justify-content:center; min-height:44px; padding:0 16px; border-radius:8px; color:var(--text); text-decoration:none; font-size:14px; font-weight:500; }
-  .theme-toggle { width:44px; height:44px; border-radius:8px; padding:13px; display:grid; place-items:center; }
-  .theme-toggle svg { width:18px; height:18px; }
-  .header nav a:hover, .theme-toggle:hover { background:var(--raised); }
-  .theme-toggle[aria-checked='true'] .moon, .theme-toggle[aria-checked='false'] .sun { display:none; }
-  .season-picker { position:relative; }
-  .season-picker summary, .season-options button { display:grid; place-items:center; width:44px; height:44px; padding:12px; border-radius:8px; cursor:pointer; color:var(--muted); }
-  .season-picker summary { list-style:none; }
-  .season-picker summary::-webkit-details-marker { display:none; }
-  .season-picker svg { width:20px; height:20px; }
-  .season-picker summary:hover, .season-options button:hover { background:var(--raised); color:var(--text); }
-  .season-picker[open] summary, .season-options button[aria-pressed='true'] { color:var(--accent); background:var(--raised); }
-  .season-options { position:absolute; z-index:5; right:-42px; top:calc(100% + 12px); display:flex; gap:2px; padding:6px; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:0 8px 24px #0002; }
   .skip-link:not(:focus) { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
   .skip-link:focus { position:fixed; top:12px; left:12px; padding:12px; background:var(--bg); z-index:10; }
 
   @media (min-width:1600px) { .page-width { width:1280px; } }
   @media (max-width:1100px) { .page-width { width:calc(100% - 64px); } }
   @media (max-width:760px) { .page-width { width:calc(100% - 40px); } }
-  @media (max-width:560px) {
-    .header { flex-wrap:wrap; gap:12px; padding-block:18px; }
-    .header-controls { width:100%; }
-    .header nav { flex:1; }
-    .header nav a { flex:1; padding-inline:12px; }
-  }
   @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
 </style>

@@ -1,6 +1,8 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import SeasonalArt from '../components/SeasonalArt.astro';
+import Navigation from '../components/Navigation.astro';
+import InterestMarquee from '../components/InterestMarquee.astro';
 import Icon from '../components/Icon.astro';
 import { notes } from '../data/notes';
 import { projects } from '../data/projects';
@@ -10,9 +12,10 @@ import { projects } from '../data/projects';
   <section class="hero-field" aria-labelledby="intro-title">
     <SeasonalArt />
     <div class="page-width hero-content">
-      <h1 id="intro-title">Software engineer.<br /><span>Curious by default.</span></h1>
+      <div class="hero-navigation"><Navigation /></div>
+      <h1 id="intro-title">Hi, I’m Emil.</h1>
       <div class="intro-bottom">
-        <p>I build backend systems, agents, and tools.<br />A few things I’m making, and what I’m learning<br class="desktop-break" /> along the way.</p>
+        <p>I’m a software engineer in Oslo. I work mostly on backend systems, and spend some of my free time playing tennis, making tools, and experimenting with graphics and simulations.</p>
         <div class="hero-socials" aria-label="Social links">
           <a class="social-button" href="https://github.com/erg0nix"><Icon name="github" /><span>GitHub</span></a>
         </div>
@@ -22,7 +25,7 @@ import { projects } from '../data/projects';
   </section>
   <div class="interest-strip">
     <div class="page-width">
-      <p>Local-first software <i aria-hidden="true"></i> Agent tooling <i aria-hidden="true"></i> Graphics &amp; simulation</p>
+      <InterestMarquee />
     </div>
   </div>
   <section class="projects-section page-width" id="projects" aria-labelledby="projects-title">
@@ -57,13 +60,13 @@ import { projects } from '../data/projects';
 </SiteLayout>
 
 <style>
-  .hero-field { position:relative; isolation:isolate; min-height:590px; overflow:hidden; border-bottom:1px solid var(--line); }
-  .hero-content { position:relative; z-index:1; padding-top:79px; padding-bottom:74px; pointer-events:none; }
+  .hero-field { position:relative; isolation:isolate; display:grid; min-height:590px; overflow:hidden; border-bottom:1px solid var(--line); }
+  .hero-navigation { position:absolute; top:24px; left:0; z-index:2; pointer-events:auto; }
+  .hero-content { position:relative; z-index:1; display:grid; grid-template-columns:minmax(0,1fr); align-content:center; padding-block:110px; pointer-events:none; }
   .hero-content a { pointer-events:auto; }
   h1 { font-size:clamp(44px,5.8vw,80px); line-height:1.04; font-weight:500; letter-spacing:-3.9px; margin:0; }
-  h1 span { color:var(--muted); }
   .intro-bottom { margin-top:31px; }
-  .intro-bottom p { margin:0; color:var(--muted); font-size:15px; line-height:1.75; }
+  .intro-bottom p { max-width:44ch; margin:0; color:var(--muted); font-size:15px; line-height:1.75; }
   .hero-socials { display:flex; flex-wrap:wrap; gap:12px; margin-top:25px; }
   .social-button { display:inline-flex; align-items:center; gap:10px; min-height:44px; padding:9px 16px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text); text-decoration:none; }
   .social-button :global(svg) { width:20px; height:20px; }
@@ -72,8 +75,6 @@ import { projects } from '../data/projects';
   .hero-edge span { height:10px; border-left:1px solid var(--line); }
   .interest-strip { border-bottom:1px solid var(--fine); }
   .interest-strip .page-width { display:flex; align-items:center; justify-content:flex-start; min-height:60px; }
-  .interest-strip p { display:flex; gap:24px; align-items:center; justify-content:flex-start; text-align:left; margin:0; color:var(--muted); }
-  .interest-strip i { width:3px; height:3px; background:var(--subtle); }
 
   .projects-section { padding-block:48px 40px; }
   .projects-heading { margin-bottom:12px; }
@@ -99,21 +100,16 @@ import { projects } from '../data/projects';
 
   @media (min-width:1600px) {
     .hero-field { min-height:640px; }
-    .hero-content { padding-top:100px; }
     h1 { font-size:86px; }
   }
   @media (max-width:1100px) {
     h1 { letter-spacing:-2.7px; }
-    .hero-content { padding-top:70px; }
   }
   @media (max-width:760px) {
     .hero-field { min-height:620px; }
-    .hero-content { padding-top:56px; padding-bottom:0; }
     h1 { font-size:clamp(40px,7.5vw,57px); letter-spacing:-2.3px; }
     .intro-bottom { margin-top:25px; }
     .intro-bottom p { font-size:14px; }
-    .interest-strip .page-width { padding-block:15px; }
-    .interest-strip p { gap:14px; }
     .notes-section { padding-bottom:48px; }
     .projects-section { padding-block:32px; }
     .project-row { grid-template-columns:20px minmax(0,1fr); gap:4px 12px; }
@@ -124,12 +120,10 @@ import { projects } from '../data/projects';
   }
   @media (max-width:560px) {
     .hero-field { min-height:650px; }
-    .hero-content { padding-top:43px; }
+    .hero-navigation { top:20px; right:0; }
     h1 { font-size:clamp(33px,8.7vw,48px); letter-spacing:-1.6px; }
-    .desktop-break { display:none; }
     .intro-bottom p { max-width:34ch; }
     .hero-socials { margin-top:18px; }
-    .interest-strip p { gap:10px; flex-wrap:wrap; }
     .note-entry a { grid-template-columns:20px max-content minmax(0,1fr); }
     .note-entry p { grid-column:2 / -1; grid-row:2; }
     .note-entry time { grid-column:3; grid-row:1; }

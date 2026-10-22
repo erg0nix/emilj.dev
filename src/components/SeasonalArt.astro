@@ -18,6 +18,7 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
 
 <script>
   import { geometry, project } from './seasonal-geometry';
+  import { drawWeather, type WeatherFrame } from './seasonal-weather';
 
   const canvas = document.querySelector<HTMLCanvasElement>('#season-field')!;
   const context = canvas.getContext('2d');
@@ -40,11 +41,20 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
     let targetY = 0;
     let turn = 0;
     let tilt = 0;
+    const weather: WeatherFrame = {
+      ctx: context, width: 0, height: 0, time: 8, season: 'autumn',
+      light: false, accent: '', muted: '',
+    };
 
     function refreshArt() {
       lines = geometry(root.dataset.season);
-      color = getComputedStyle(root).getPropertyValue('--art').trim();
+      const styles = getComputedStyle(root);
+      color = styles.getPropertyValue('--art').trim();
       light = root.dataset.theme === 'light';
+      weather.season = root.dataset.season || 'autumn';
+      weather.light = light;
+      weather.accent = styles.getPropertyValue('--accent').trim();
+      weather.muted = styles.getPropertyValue('--muted').trim();
       draw(reduced.matches ? 0 : performance.now());
     }
 
@@ -52,6 +62,8 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
       const rect = art.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
+      weather.width = width;
+      weather.height = height;
       const ratio = Math.min(devicePixelRatio, 1.75);
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
@@ -62,13 +74,15 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
     function draw(time: number) {
       if (!width) return;
       const compact = width <= 760;
-      const scale = compact ? Math.min(width * .47, 230) : Math.min(width * .265, 430);
-      const centerX = compact ? width * .535 : width * .645;
+      const scale = compact
+        ? Math.min(width * .32, height * .15, 120)
+        : Math.min(width * .2, height * .32, 250);
+      const centerX = Math.max(scale * 1.3 + 16, width * (compact ? .535 : .645) - scale);
       const centerY = compact ? height * .78 : height * .53;
       const idle = reduced.matches ? 0 : Math.sin(time / 6500) * .055;
       const movement = reduced.matches ? 0 : Math.sin(time / 5200) * 7;
       context.clearRect(0, 0, width, height);
-      context.lineWidth = compact ? .55 : .65;
+      context.lineWidth = compact ? (light ? .75 : .55) : (light ? .85 : .65);
 
       for (let row = 0; row < lines.length; row++) {
         const points = lines[row].map(point => {
@@ -81,7 +95,7 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
         });
         const depth = points[Math.floor(points.length / 2)][2];
         const opacity = Math.max(.15, Math.min(.8, .43 + depth * .25));
-        context.strokeStyle = `rgba(${color},${light ? opacity * .8 : opacity})`;
+        context.strokeStyle = `rgba(${color},${opacity})`;
         context.beginPath();
         points.forEach(([x, y], index) => {
           if (index === 0) context.moveTo(x, y);
@@ -109,6 +123,9 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
         const size = i % 7 === 0 ? 2 : 1;
         context.fillRect(x, y, size, size);
       }
+      context.save();
+      drawWeather(weather);
+      context.restore();
       art.classList.add('ready');
     }
 
@@ -116,6 +133,7 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
       frame = 0;
       if (reduced.matches || document.hidden || !visible) return;
       if (time - lastTime >= 32) {
+        weather.time += Math.min((time - lastTime) / 1000, .05);
         turn += (targetX - turn) * .06;
         tilt += (targetY - tilt) * .06;
         draw(time);
@@ -131,6 +149,7 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
 
     function updateMotion() {
       stopAnimation();
+      lastTime = performance.now();
       if (visible && !document.hidden && !reduced.matches) {
         frame = requestAnimationFrame(animate);
       } else {
@@ -167,11 +186,11 @@ const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
 </script>
 
 <style>
-  .field-art { position:absolute; inset:0; z-index:0; overflow:hidden; }
+  .field-art { position:absolute; inset:0; z-index:0; overflow:hidden; container-type:size; }
   canvas { width:100%; height:100%; display:block; position:absolute; inset:0; }
-  .field-fallback { position:absolute; left:64.5%; top:53%; width:min(79.5vw, 1290px); transform:translate(-50%, -50%); stroke:var(--accent); stroke-width:.0025; opacity:.6; }
+  .field-fallback { --art-scale:min(20cqw, 32cqh, 250px); position:absolute; left:max(calc(var(--art-scale) * 1.3 + 16px), calc(64.5% - var(--art-scale))); top:53%; width:calc(var(--art-scale) * 3); height:auto; transform:translate(-50%, -50%); stroke:var(--accent); stroke-width:.0025; opacity:.6; }
   .field-art.ready .field-fallback { visibility:hidden; }
   @media (max-width:760px) {
-    .field-fallback { left:53.5%; top:78%; width:min(141vw, 690px); }
+    .field-fallback { --art-scale:min(32cqw, 15cqh, 120px); left:max(calc(var(--art-scale) * 1.3 + 16px), calc(53.5% - var(--art-scale))); top:78%; }
   }
 </style>
