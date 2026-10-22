@@ -1,0 +1,196 @@
+---
+import { geometry, project } from './seasonal-geometry';
+
+const fallback = geometry().filter((_, index) => index % 4 === 0).map(line =>
+  line.filter((_, index) => index % 3 === 0).map((point, index) => {
+    const [x, y] = project(point);
+    return `${index ? 'L' : 'M'}${x.toFixed(4)} ${y.toFixed(4)}`;
+  }).join(' ')
+);
+---
+
+<div class="field-art" aria-hidden="true">
+  <svg class="field-fallback" viewBox="-1.5 -1.6 3 3.2" fill="none">
+    {fallback.map(path => <path d={path} />)}
+  </svg>
+  <canvas id="season-field"></canvas>
+</div>
+
+<script>
+  import { geometry, project } from './seasonal-geometry';
+  import { drawWeather, type WeatherFrame } from './seasonal-weather';
+
+  const canvas = document.querySelector<HTMLCanvasElement>('#season-field')!;
+  const context = canvas.getContext('2d');
+  if (context) animateArt(canvas, context);
+
+  function animateArt(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+    const root = document.documentElement;
+    const art = canvas.parentElement!;
+    const hero = art.closest<HTMLElement>('.hero-field')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    let lines = geometry(root.dataset.season);
+    let color = '';
+    let light = false;
+    let width = 0;
+    let height = 0;
+    let visible = true;
+    let frame = 0;
+    let lastTime = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let turn = 0;
+    let tilt = 0;
+    const weather: WeatherFrame = {
+      ctx: context, width: 0, height: 0, time: 8, season: 'autumn',
+      light: false, accent: '', muted: '',
+    };
+
+    function refreshArt() {
+      lines = geometry(root.dataset.season);
+      const styles = getComputedStyle(root);
+      color = styles.getPropertyValue('--art').trim();
+      light = root.dataset.theme === 'light';
+      weather.season = root.dataset.season || 'autumn';
+      weather.light = light;
+      weather.accent = styles.getPropertyValue('--accent').trim();
+      weather.muted = styles.getPropertyValue('--muted').trim();
+      draw(reduced.matches ? 0 : performance.now());
+    }
+
+    function resize() {
+      const rect = art.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+      weather.width = width;
+      weather.height = height;
+      const ratio = Math.min(devicePixelRatio, 1.75);
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      draw(reduced.matches ? 0 : performance.now());
+    }
+
+    function draw(time: number) {
+      if (!width) return;
+      const compact = width <= 760;
+      const scale = compact
+        ? Math.min(width * .32, height * .15, 120)
+        : Math.min(width * .2, height * .32, 250);
+      const centerX = Math.max(scale * 1.3 + 16, width * (compact ? .535 : .645) - scale);
+      const centerY = compact ? height * .78 : height * .53;
+      const idle = reduced.matches ? 0 : Math.sin(time / 6500) * .055;
+      const movement = reduced.matches ? 0 : Math.sin(time / 5200) * 7;
+      context.clearRect(0, 0, width, height);
+      context.lineWidth = compact ? (light ? .75 : .55) : (light ? .85 : .65);
+
+      for (let row = 0; row < lines.length; row++) {
+        const points = lines[row].map(point => {
+          const transformed = project(point, turn + idle, tilt + idle * .6);
+          return [
+            transformed[0] * scale + centerX,
+            transformed[1] * scale + centerY + movement,
+            transformed[2],
+          ];
+        });
+        const depth = points[Math.floor(points.length / 2)][2];
+        const opacity = Math.max(.15, Math.min(.8, .43 + depth * .25));
+        context.strokeStyle = `rgba(${color},${opacity})`;
+        context.beginPath();
+        points.forEach(([x, y], index) => {
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.stroke();
+
+        if (row % 2 === 0) {
+          context.fillStyle = `rgba(${color},${Math.min(.9, opacity + .25)})`;
+          for (let p = 0; p < points.length; p += 2) {
+            const [x, y] = points[p];
+            const size = (p + row) % 11 === 0 ? 1.7 : .8;
+            const jitter = Math.sin(p * 13.37 + row * 7.91) * 1.2;
+            context.fillRect(x + jitter, y - jitter, size, size);
+          }
+        }
+      }
+
+      for (let i = 0; i < 55; i++) {
+        const angle = i * 2.39996;
+        const radius = .85 + (i % 7) * .07;
+        const x = centerX + Math.cos(angle) * radius * scale * .9;
+        const y = centerY + Math.sin(angle) * radius * scale * 1.15 + movement;
+        context.fillStyle = `rgba(${color},${.1 + (i % 4) * .065})`;
+        const size = i % 7 === 0 ? 2 : 1;
+        context.fillRect(x, y, size, size);
+      }
+      context.save();
+      drawWeather(weather);
+      context.restore();
+      art.classList.add('ready');
+    }
+
+    function animate(time: number) {
+      frame = 0;
+      if (reduced.matches || document.hidden || !visible) return;
+      if (time - lastTime >= 32) {
+        weather.time += Math.min((time - lastTime) / 1000, .05);
+        turn += (targetX - turn) * .06;
+        tilt += (targetY - tilt) * .06;
+        draw(time);
+        lastTime = time;
+      }
+      frame = requestAnimationFrame(animate);
+    }
+
+    function stopAnimation() {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    }
+
+    function updateMotion() {
+      stopAnimation();
+      lastTime = performance.now();
+      if (visible && !document.hidden && !reduced.matches) {
+        frame = requestAnimationFrame(animate);
+      } else {
+        targetX = targetY = turn = tilt = 0;
+        draw(0);
+      }
+    }
+
+    hero.addEventListener('pointermove', event => {
+      if (event.pointerType === 'touch' || reduced.matches) return;
+      const rect = hero.getBoundingClientRect();
+      targetX = ((event.clientX - rect.left) / rect.width - .5) * .35;
+      targetY = ((event.clientY - rect.top) / rect.height - .5) * -.2;
+    });
+    hero.addEventListener('pointerleave', () => {
+      targetX = targetY = 0;
+    });
+    reduced.addEventListener('change', updateMotion);
+    document.addEventListener('visibilitychange', updateMotion);
+    document.addEventListener('seasonchange', refreshArt);
+    document.addEventListener('themechange', refreshArt);
+    window.addEventListener('pagehide', stopAnimation);
+    window.addEventListener('pageshow', updateMotion);
+
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      updateMotion();
+    }).observe(hero);
+    new ResizeObserver(resize).observe(art);
+    refreshArt();
+    resize();
+    updateMotion();
+  }
+</script>
+
+<style>
+  .field-art { position:absolute; inset:0; z-index:0; overflow:hidden; container-type:size; }
+  canvas { width:100%; height:100%; display:block; position:absolute; inset:0; }
+  .field-fallback { --art-scale:min(20cqw, 32cqh, 250px); position:absolute; left:max(calc(var(--art-scale) * 1.3 + 16px), calc(64.5% - var(--art-scale))); top:53%; width:calc(var(--art-scale) * 3); height:auto; transform:translate(-50%, -50%); stroke:var(--accent); stroke-width:.0025; opacity:.6; }
+  .field-art.ready .field-fallback { visibility:hidden; }
+  @media (max-width:760px) {
+    .field-fallback { --art-scale:min(32cqw, 15cqh, 120px); left:max(calc(var(--art-scale) * 1.3 + 16px), calc(53.5% - var(--art-scale))); top:78%; }
+  }
+</style>

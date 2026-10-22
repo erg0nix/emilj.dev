@@ -1,5 +1,6 @@
 ---
 import SiteLayout from './SiteLayout.astro';
+import Navigation from '../components/Navigation.astro';
 
 interface Props {
   title: string;
@@ -11,6 +12,7 @@ const { title, summary, backHref, backLabel } = Astro.props;
 ---
 
 <SiteLayout title={`${title} · emilj.dev`} description={summary}>
+  <div class="article-navigation page-width"><Navigation /></div>
   <article class="article" aria-labelledby="article-title">
     <a class="back-link" href={backHref}>{backLabel}</a>
     <header class="article-heading">
@@ -24,9 +26,10 @@ const { title, summary, backHref, backLabel } = Astro.props;
 </SiteLayout>
 
 <style>
-  .article { max-width: var(--article-width); margin: 48px auto 80px; }
+  .article-navigation { display:flex; justify-content:flex-start; padding-top:24px; }
+  .article { width: min(680px, calc(100% - 40px)); margin: 48px auto 80px; }
   .back-link { display: inline-block; padding-block: 8px; }
-  .article-heading { margin-block: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+  .article-heading { margin-block: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
   .article-meta { display: flex; flex-wrap: wrap; gap: 20px; color: var(--muted); margin: 0 0 16px; }
   h1 { margin: 0 0 20px; font-size: clamp(28px, 4vw, 40px); line-height: 1.15; letter-spacing: -1px; font-weight: 600; text-wrap: balance; }
   .summary { margin: 0; color: var(--muted); }
@@ -34,6 +37,7 @@ const { title, summary, backHref, backLabel } = Astro.props;
   .article-body :global(h2) { margin: 0 0 20px; font-size: 22px; line-height: 1.3; letter-spacing: -.4px; font-weight: 600; }
   .article-body :global(p) { margin: 0 0 24px; }
   @media (max-width: 560px) {
+    .article-navigation { padding-top:20px; }
     .article { margin-block: 24px 48px; }
     .article-heading { margin-block: 24px; padding-bottom: 24px; }
   }

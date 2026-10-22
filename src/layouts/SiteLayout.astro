@@ -7,191 +7,112 @@ const {
   title = 'emilj.dev',
   description = "Emil's personal website. Projects, notes, and other things.",
 } = Astro.props;
-
-const glyphs: Record<string, string[]> = {
-  e: ['00000', '00000', '01110', '10001', '11111', '10000', '01111'],
-  m: ['00000', '00000', '11010', '10101', '10101', '10101', '10101'],
-  i: ['010', '000', '110', '010', '010', '010', '111'],
-  l: ['110', '010', '010', '010', '010', '010', '011'],
-  j: ['0010', '0000', '0110', '0010', '0010', '1010', '1100'],
-  '.': ['00', '00', '00', '00', '00', '11', '11'],
-  d: ['00001', '00001', '01101', '10011', '10001', '10001', '01111'],
-  v: ['00000', '00000', '10001', '10001', '10001', '01010', '00100'],
-};
-let wordmarkWidth = 0;
-const pixels = [...'emilj.dev'].flatMap((letter) => {
-  const offset = wordmarkWidth;
-  wordmarkWidth += glyphs[letter][0].length + 1;
-  return glyphs[letter].flatMap((row, y) =>
-    [...row].flatMap((pixel, x) => pixel === '1' ? [{ x: offset + x, y }] : [])
-  );
-});
-wordmarkWidth -= 1;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-season="autumn">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="dark light" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     <script is:inline>
       (() => {
         const root = document.documentElement;
-        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
         const seasons = ['winter', 'spring', 'summer', 'autumn'];
-        let themeChoice = 'system';
+        let theme = 'dark';
         let seasonChoice = 'auto';
         try {
           const savedTheme = localStorage.getItem('theme');
           const savedSeason = localStorage.getItem('season');
-          if (savedTheme === 'light' || savedTheme === 'dark') themeChoice = savedTheme;
+          if (['light', 'dark'].includes(savedTheme)) theme = savedTheme;
           if (seasons.includes(savedSeason)) seasonChoice = savedSeason;
         } catch {
-          // System and calendar defaults work when storage is unavailable.
+          // Defaults remain available when storage is blocked.
         }
-        const updateTheme = () => {
-          const dark = themeChoice === 'system' ? systemTheme.matches : themeChoice === 'dark';
-          root.dataset.theme = dark ? 'dark' : 'light';
-          const toggle = document.getElementById('theme');
-          if (toggle) {
-            toggle.setAttribute('aria-checked', String(dark));
-            toggle.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+
+        function updateTheme() {
+          root.dataset.theme = theme;
+          const button = document.getElementById('theme');
+          if (button) {
+            button.setAttribute('aria-checked', String(theme === 'dark'));
+            button.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
           }
-        };
-        const updateSeason = () => {
+          document.dispatchEvent(new Event('themechange'));
+        }
+
+        function updateSeason() {
           const month = new Date().getMonth();
           root.dataset.season = seasonChoice === 'auto'
             ? seasons[Math.floor(((month + 1) % 12) / 3)]
             : seasonChoice;
+
+          const summary = document.querySelector('.season-picker summary');
+          if (summary) {
+            for (const button of document.querySelectorAll('[data-season-choice]')) {
+              const selected = button.dataset.seasonChoice === seasonChoice;
+              button.setAttribute('aria-pressed', String(selected));
+              if (selected) {
+                summary.replaceChildren(button.querySelector('svg').cloneNode(true));
+                const label = 'Season: ' + button.getAttribute('aria-label');
+                summary.setAttribute('aria-label', label);
+                summary.title = label;
+              }
+            }
+          }
           document.dispatchEvent(new Event('seasonchange'));
-        };
+        }
+
         updateTheme();
         updateSeason();
+
         document.addEventListener('DOMContentLoaded', () => {
-          const themeToggle = document.getElementById('theme');
+          const themeButton = document.getElementById('theme');
+          const picker = document.querySelector('.season-picker');
+          const summary = picker.querySelector('summary');
           updateTheme();
-          themeToggle.hidden = false;
-          systemTheme.addEventListener('change', updateTheme);
-          themeToggle.addEventListener('click', () => {
-            themeChoice = root.dataset.theme === 'dark' ? 'light' : 'dark';
+          updateSeason();
+          themeButton.hidden = false;
+          picker.hidden = false;
+
+          themeButton.addEventListener('click', () => {
+            theme = theme === 'dark' ? 'light' : 'dark';
             updateTheme();
-            themeToggle.classList.remove('theme-flip');
-            void themeToggle.offsetWidth;
-            themeToggle.classList.add('theme-flip');
             try {
-              localStorage.setItem('theme', themeChoice);
+              localStorage.setItem('theme', theme);
             } catch {
-              // Keep the selection for this page when storage is blocked.
+              // The current page still reflects the selection.
             }
           });
-          const seasonSelect = document.getElementById('season-select');
-          const seasonControl = seasonSelect.closest('.season-control');
-          const seasonMenu = document.getElementById('season-options');
-          const seasonOptions = [...seasonMenu.children];
-          let activeIndex = seasonOptions.findIndex(option => option.dataset.value === seasonChoice);
-          let search = '';
-          let searchTime = 0;
-          const displayChoice = () => {
-            seasonOptions.forEach(option => {
-              const selected = option.dataset.value === seasonChoice;
-              option.setAttribute('aria-selected', String(selected));
-              if (selected) document.getElementById('season-value').textContent = option.textContent;
-            });
-          };
-          const highlightOption = (index) => {
-            activeIndex = index;
-            seasonOptions.forEach((option, i) => option.classList.toggle('active', i === index));
-            seasonSelect.setAttribute('aria-activedescendant', seasonOptions[index].id);
-            seasonOptions[index].scrollIntoView({ block: 'nearest' });
-          };
-          const closeMenu = () => {
-            seasonMenu.hidden = true;
-            seasonSelect.setAttribute('aria-expanded', 'false');
-            seasonSelect.removeAttribute('aria-activedescendant');
-            search = '';
-          };
-          const openMenu = () => {
-            seasonMenu.hidden = false;
-            const bounds = seasonControl.getBoundingClientRect();
-            const height = seasonMenu.offsetHeight + 4;
-            seasonMenu.classList.toggle('above', window.innerHeight - bounds.bottom < height && bounds.top > height);
-            seasonSelect.setAttribute('aria-expanded', 'true');
-            highlightOption(seasonOptions.findIndex(option => option.dataset.value === seasonChoice));
-          };
-          const commitChoice = () => {
-            seasonChoice = seasonOptions[activeIndex].dataset.value;
-            displayChoice();
-            closeMenu();
-            updateSeason();
-            try {
-              if (seasonChoice === 'auto') localStorage.removeItem('season');
-              else localStorage.setItem('season', seasonChoice);
-            } catch {
-              // Keep the selection for this page when storage is blocked.
-            }
-          };
-          displayChoice();
-          seasonControl.hidden = false;
-          seasonSelect.addEventListener('click', () => {
-            if (seasonMenu.hidden) openMenu();
-            else closeMenu();
-          });
-          seasonSelect.addEventListener('keydown', (event) => {
-            const { key } = event;
-            if (key === 'Tab') {
-              if (!seasonMenu.hidden) commitChoice();
-              return;
-            }
-            if (key === 'Escape') {
-              if (!seasonMenu.hidden) {
-                event.preventDefault();
-                closeMenu();
+
+          for (const button of picker.querySelectorAll('[data-season-choice]')) {
+            button.addEventListener('click', () => {
+              seasonChoice = button.dataset.seasonChoice;
+              updateSeason();
+              picker.open = false;
+              summary.focus();
+              try {
+                if (seasonChoice === 'auto') localStorage.removeItem('season');
+                else localStorage.setItem('season', seasonChoice);
+              } catch {
+                // The current page still reflects the selection.
               }
-              return;
-            }
-            if (['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter', ' '].includes(key)) {
-              event.preventDefault();
-              const wasOpen = !seasonMenu.hidden;
-              if (!wasOpen) openMenu();
-              if (key === 'Home') highlightOption(0);
-              else if (key === 'End') highlightOption(seasonOptions.length - 1);
-              else if (wasOpen && key === 'ArrowDown') highlightOption(Math.min(activeIndex + 1, seasonOptions.length - 1));
-              else if (wasOpen && key === 'ArrowUp') highlightOption(Math.max(activeIndex - 1, 0));
-              else if (wasOpen && (key === 'Enter' || key === ' ')) commitChoice();
-            } else if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
-              event.preventDefault();
-              if (seasonMenu.hidden) openMenu();
-              const now = performance.now();
-              search = now - searchTime > 700 ? key.toLowerCase() : search + key.toLowerCase();
-              searchTime = now;
-              const prefix = [...search].every(letter => letter === search[0]) ? search[0] : search;
-              for (let offset = 1; offset <= seasonOptions.length; offset++) {
-                const index = (activeIndex + offset) % seasonOptions.length;
-                if (seasonOptions[index].textContent.toLowerCase().startsWith(prefix)) {
-                  highlightOption(index);
-                  break;
-                }
-              }
-            }
-          });
-          seasonOptions.forEach((option, index) => {
-            option.addEventListener('pointermove', () => highlightOption(index));
-            option.addEventListener('mousedown', event => event.preventDefault());
-            option.addEventListener('click', () => {
-              activeIndex = index;
-              commitChoice();
-              seasonSelect.focus({ preventScroll: true });
             });
-          });
+          }
+
           document.addEventListener('pointerdown', event => {
-            if (!seasonControl.contains(event.target)) closeMenu();
+            if (!picker.contains(event.target)) picker.open = false;
           });
-          seasonControl.addEventListener('focusout', event => {
-            if (!seasonControl.contains(event.relatedTarget)) closeMenu();
+          picker.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+              picker.open = false;
+              summary.focus();
+            }
+          });
+          picker.addEventListener('focusout', event => {
+            if (!picker.contains(event.relatedTarget)) picker.open = false;
           });
           document.addEventListener('visibilitychange', () => {
             if (!document.hidden && seasonChoice === 'auto') updateSeason();
@@ -202,233 +123,37 @@ wordmarkWidth -= 1;
   </head>
   <body id="top">
     <a class="skip-link" href="#main">Skip to content</a>
-    <div class="shell">
-      <header class="header">
-        <a class="home-link" href="/" aria-label="emilj.dev, home">
-          <svg class="wordmark" viewBox={`0 0 ${wordmarkWidth} 7`} aria-hidden="true" shape-rendering="crispEdges">
-            <defs>
-              <linearGradient id="wordmark-gradient" x1="0" y1="0" x2="1" y2=".8">
-                <stop class="wordmark-start" offset="0%" />
-                <stop class="wordmark-end" offset="100%" />
-              </linearGradient>
-              <mask id="wordmark-mask">
-                {pixels.map(({ x, y }) => <rect x={x} y={y} width="1" height="1" fill="white" />)}
-              </mask>
-            </defs>
-            <rect width={wordmarkWidth} height="7" fill="url(#wordmark-gradient)" mask="url(#wordmark-mask)" />
-          </svg>
-        </a>
-        <div class="header-controls">
-          <nav aria-label="Main navigation">
-            <a href="/#projects">Projects</a>
-            <a href="/#notes">Notes</a>
-            <a href="https://github.com/erg0nix">GitHub</a>
-          </nav>
-          <button id="theme" class="theme-toggle" type="button" role="switch" aria-label="Dark mode" aria-checked="false" hidden>
-            <svg class="sun" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" />
-            </svg>
-            <svg class="moon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20.5 13a8.5 8.5 0 0 1-9.5-9.5A8.5 8.5 0 1 0 20.5 13Z" />
-            </svg>
-          </button>
-        </div>
-      </header>
-      <main id="main"><slot /></main>
-      <footer>
-        <span>© {new Date().getFullYear()} Emil</span>
-        <div class="footer-links">
-          <div class="season-control" hidden>
-            <span id="season-label">Set season</span>
-            <button id="season-select" type="button" role="combobox" aria-labelledby="season-label" aria-controls="season-options" aria-haspopup="listbox" aria-expanded="false">
-              <span id="season-value">Automatic</span>
-              <svg class="season-chevron" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m4 6 4 4 4-4" />
-              </svg>
-            </button>
-            <ul id="season-options" role="listbox" aria-labelledby="season-label" hidden>
-              <li id="season-option-auto" role="option" data-value="auto" aria-selected="true">Automatic</li>
-              <li id="season-option-winter" role="option" data-value="winter" aria-selected="false">Winter</li>
-              <li id="season-option-spring" role="option" data-value="spring" aria-selected="false">Spring</li>
-              <li id="season-option-summer" role="option" data-value="summer" aria-selected="false">Summer</li>
-              <li id="season-option-autumn" role="option" data-value="autumn" aria-selected="false">Autumn</li>
-            </ul>
-          </div>
-          <a href="#top">Back to top</a>
-        </div>
-      </footer>
-    </div>
-    <slot name="scripts" />
+    <main id="main"><slot /></main>
   </body>
 </html>
 
-<style>
-  :global(:root) {
-    color-scheme: light;
-    --article-width: 680px;
-    --motif: #fff0cf; --hero-text: #262626; --hero-copy: #392719; --hero-line: #ff802e; --particle: #934217; --spark: #fff0cf; --motif-shadow: #d64b1526;
-    --page: #f5f4f1;
-    --text: #262626;
-    --muted: #626262;
-    --border: #d2cfc8;
-    --divider: #c3bfb6;
-    --accent: #b93800;
-    --surface-hover: #eae8e3;
-    --link: var(--accent);
-    --link-hover: #923000;
-    --season-start: #ff914d;
-    --season-end: #ff5b19;
-    --art-surface: #faf8f5;
-    --art-grid: #ece6df;
-    --art-paper: #fffdf9;
-    --art-stroke: #a69785;
-    --hero: radial-gradient(ellipse at 75% 115%, #ffe4a3, transparent 55%), linear-gradient(115deg, var(--season-start), var(--season-end) 75%);
-  }
-  :global(:root[data-theme='dark']) {
-    color-scheme: dark;
-    --page: #151515;
-    --text: #f5f5f5;
-    --muted: #b3b3b3;
-    --border: #2c2c2c;
-    --divider: #363636;
-    --accent: #ff9a52;
-    --surface-hover: #292929;
-    --link-hover: #ffbc8c;
-    --art-surface: #1e1c19;
-    --art-grid: #302b25;
-    --art-paper: #332b22;
-    --art-stroke: #a68b6b;
-  }
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme])) {
-      color-scheme: dark;
-      --page: #151515;
-      --text: #f5f5f5;
-      --muted: #b3b3b3;
-      --border: #2c2c2c;
-      --divider: #363636;
-      --accent: #ff9a52;
-      --surface-hover: #292929;
-      --link-hover: #ffbc8c;
-      --art-surface: #1e1c19;
-      --art-grid: #302b25;
-      --art-paper: #332b22;
-      --art-stroke: #a68b6b;
-    }
-  }
+<style is:global>
+  :root { color-scheme:dark; --bg:#090b0d; --surface:#101315; --raised:#171b1e; --text:#eceeef; --muted:#979fa6; --subtle:#768087; --line:#23292d; --fine:#1a2024; --accent:#e79c60; --art:225,140,73; }
+  :root[data-theme='light'] { color-scheme:light; --bg:#e8e7e2; --surface:#dfe1da; --raised:#efeee8; --text:#20292d; --muted:#56646d; --subtle:#64717a; --line:#c9cfc9; --fine:#d7dad2; --accent:#99501b; --art:165,91,37; }
+  :root[data-season='winter'] { --accent:#9cc9e5; --art:139,192,224; }
+  :root[data-season='spring'] { --accent:#dba7bc; --art:212,158,182; }
+  :root[data-season='summer'] { --accent:#dbc37e; --art:213,184,105; }
+  :root[data-season='winter'][data-theme='light'] { --accent:#28628b; --art:50,106,143; }
+  :root[data-season='spring'][data-theme='light'] { --accent:#954164; --art:145,76,109; }
+  :root[data-season='summer'][data-theme='light'] { --accent:#796019; --art:130,105,42; }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; scroll-padding-top:32px; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.6 Arial,Helvetica,sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:var(--accent); text-decoration-color:currentColor; text-underline-offset:5px; }
+  a:hover { text-decoration-thickness:2px; }
+  button, select { font:inherit; color:inherit; }
+  button, select, a { -webkit-tap-highlight-color:transparent; }
+  button, select { cursor:pointer; }
+  button { background:none; border:0; }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:5px; }
+  ::selection { color:var(--bg); background:var(--accent); }
+  [hidden] { display:none!important; }
+  .page-width { width:min(1200px, calc(100% - 96px)); margin-inline:auto; }
+  .skip-link:not(:focus) { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  .skip-link:focus { position:fixed; top:12px; left:12px; padding:12px; background:var(--bg); z-index:10; }
 
-  :global(:root[data-season='winter']) {
-    --page: #f0f3f5; --text: #26333f; --muted: #566b7a; --border: #c9d3dc; --divider: #b3c3d1;
-    --accent: #205f91; --link-hover: #17446b; --surface-hover: #e1e8ee;
-    --season-start: #83cbe8; --season-end: #5484df;
-    --hero: radial-gradient(ellipse at 90% 110%, #d1f6ed, transparent 58%), linear-gradient(115deg, #c9e7ee, #93b8ee 80%);
-    --hero-line: #94b8d5; --hero-text: #17334f; --hero-copy: #284b68; --motif: #f5fbff;
-    --particle: #f6fcff; --spark: #fff; --motif-shadow: #33588925;
-    --art-surface: #e7edf2; --art-grid: #d4dfe8; --art-paper: #f5f8fa; --art-stroke: #8199aa;
-  }
-  :global(:root[data-season='winter'][data-theme='dark']) {
-    --page: #111820; --text: #e9f0f6; --muted: #a7b9c9; --border: #2c3b49; --divider: #3f5466;
-    --accent: #95c9f7; --link-hover: #c6e5ff; --surface-hover: #22313f;
-    --hero: radial-gradient(ellipse at 90% 120%, #26576c, transparent 62%), linear-gradient(115deg, #1b3453, #273b64 80%);
-    --hero-line: #405a7e; --hero-text: #f0f7ff; --hero-copy: #c6d8eb; --motif: #daf3ff;
-    --particle: #e5f7ff; --motif-shadow: #061b4040;
-    --art-surface: #1a2530; --art-grid: #2b3948; --art-paper: #253544; --art-stroke: #819db3;
-  }
-  :global(:root[data-season='spring']) {
-    --page: #f2f4ed; --text: #28392c; --muted: #5d6d5f; --border: #cbd3c4; --divider: #b6c2ae;
-    --accent: #326c42; --link-hover: #214e30; --surface-hover: #e3e9dc;
-    --season-start: #99d989; --season-end: #3e9b70;
-    --hero: radial-gradient(ellipse at 88% 115%, #f6e8b3, transparent 60%), linear-gradient(115deg, #b9dda0, #79c69e 80%);
-    --hero-line: #8fbc84; --hero-text: #1d422e; --hero-copy: #2e503c; --motif: #ffe5e9;
-    --particle: #fff0f3; --spark: #fbb3cb; --motif-shadow: #40683d25;
-    --art-surface: #e8eddf; --art-grid: #d7decb; --art-paper: #f8faf2; --art-stroke: #8b9d7d;
-  }
-  :global(:root[data-season='spring'][data-theme='dark']) {
-    --page: #141b17; --text: #edf4e9; --muted: #afc0ad; --border: #314237; --divider: #455b48;
-    --accent: #a8d79a; --link-hover: #d4eccb; --surface-hover: #27392b;
-    --hero: radial-gradient(ellipse at 95% 110%, #4b6848, transparent 62%), linear-gradient(115deg, #204a3d, #2a634c 80%);
-    --hero-line: #426d54; --hero-text: #f0f8df; --hero-copy: #c9ddc2; --motif: #f7c9df;
-    --particle: #f3bad4; --motif-shadow: #092d3040;
-    --art-surface: #1f2b21; --art-grid: #314431; --art-paper: #2d3d2b; --art-stroke: #93a887;
-  }
-  :global(:root[data-season='summer']) {
-    --page: #f5f3e9; --text: #34382e; --muted: #686b58; --border: #d4d0ba; --divider: #bfbaa0;
-    --accent: #6f5714; --link-hover: #4c3c0c; --surface-hover: #eae6d5;
-    --season-start: #f1cf55; --season-end: #c59623;
-    --hero: radial-gradient(ellipse at 95% 120%, #e9efc4, transparent 58%), linear-gradient(115deg, #fae599, #eed15a 80%);
-    --hero-line: #d7be64; --hero-text: #3c371b; --hero-copy: #56502a; --motif: #fff8d8;
-    --particle: #fffce9; --spark: #fff9d0; --motif-shadow: #98792125;
-    --art-surface: #eeeada; --art-grid: #dfd9bf; --art-paper: #faf7ec; --art-stroke: #a29a78;
-  }
-  :global(:root[data-season='summer'][data-theme='dark']) {
-    --page: #151c1c; --text: #f0f1df; --muted: #b3bdb0; --border: #334443; --divider: #4b5d55;
-    --accent: #ead17e; --link-hover: #fff0b8; --surface-hover: #293b38;
-    --hero: radial-gradient(ellipse at 90% 125%, #847346, transparent 64%), linear-gradient(115deg, #183c43, #315d59 80%);
-    --hero-line: #4b6b61; --hero-text: #fff5ce; --hero-copy: #d1dbc4; --motif: #ffe69a;
-    --particle: #ffeaa0; --motif-shadow: #072b3440;
-    --art-surface: #202f2c; --art-grid: #35443c; --art-paper: #344335; --art-stroke: #9aa584;
-  }
-  :global(*) { box-sizing: border-box; }
-  :global(html) { scroll-behavior: smooth; scroll-padding-top: 2rem; }
-  :global(body) { margin: 0; color: var(--text); background: var(--page); font: 14px/1.65 Arial, Helvetica, sans-serif; -webkit-font-smoothing: antialiased; }
-  :global(a) { color: var(--link); text-decoration: underline; text-underline-offset: 4px; }
-  :global(a:hover) { color: var(--link-hover); text-decoration-thickness: 2px; }
-  :global(:focus-visible) { outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 3px; }
-  :global(::selection) { color: #262626; background: var(--season-start); }
-  .shell { max-width: 1280px; margin-inline: auto; padding: 0 40px; }
-  .header { min-height: 104px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 24px; }
-  .home-link { display: inline-flex; align-items: center; min-height: 44px; flex-shrink: 0; }
-  .wordmark { transform-origin: left center; width: 180px; height: auto; overflow: visible; }
-  .home-link:hover .wordmark, .home-link:focus-visible .wordmark { animation: wordmark-nudge 450ms cubic-bezier(.2,.8,.2,1); }
-  @keyframes wordmark-nudge { 40% { transform: translateY(-2px) rotate(-1deg); } }
-  .theme-flip svg { animation: icon-in 220ms cubic-bezier(.2,.8,.2,1); }
-  @keyframes icon-in { from { opacity: .2; transform: rotate(-35deg) scale(.7); } to { opacity: 1; transform: rotate(0) scale(1); } }
-  .wordmark-start { stop-color: var(--season-start); }
-  .wordmark-end { stop-color: var(--season-end); }
-  .header-controls { display: flex; align-items: center; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 12px; }
-  .theme-toggle { flex-shrink: 0; color: var(--text); background: transparent; border: 0; border-radius: 8px; width: 44px; height: 44px; padding: 13px; cursor: pointer; }
-  .theme-toggle:not([hidden]) { display: grid; place-items: center; }
-  .theme-toggle:hover, nav a:hover { color: var(--text); background: var(--surface-hover); }
-  .header-controls :focus-visible { outline-offset: 2px; border-radius: 8px; }
-  .theme-toggle svg { display: block; width: 18px; height: 18px; }
-  .theme-toggle:active { transform: scale(.94); }
-  .theme-toggle[aria-checked='false'] .sun, .theme-toggle[aria-checked='true'] .moon { display: none; }
-  nav { display: flex; align-items: center; gap: 4px; }
-  nav a { transition: background-color 140ms ease, color 140ms ease; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; color: var(--text); border-radius: 8px; font-weight: 500; line-height: 20px; text-decoration: none; }
-  footer { max-width: var(--article-width); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 128px 0; color: var(--muted); }
-  .footer-links { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; }
-  .footer-links a { padding-block: 8px; }
-  .season-control:not([hidden]) { position: relative; display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); white-space: nowrap; }
-  .season-control > span { padding-inline: 8px; }
-  #season-select { position: relative; min-height: 30px; width: 110px; padding: 0 28px 0 8px; color: var(--text); background: transparent; border: 0; border-radius: 5px; font: inherit; line-height: 20px; text-align: left; cursor: pointer; }
-  #season-select:hover, #season-select[aria-expanded='true'] { background: var(--surface-hover); }
-  #season-select:focus-visible { outline-offset: 2px; border-radius: 5px; }
-  #season-options { position: absolute; z-index: 5; top: calc(100% + 5px); right: -1px; width: 160px; margin: 0; padding: 4px; list-style: none; color: var(--text); background: var(--page); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 16px #00000014; }
-  #season-options.above { top: auto; bottom: calc(100% + 5px); }
-  #season-options li { display: flex; align-items: center; justify-content: space-between; min-height: 32px; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
-  #season-options li.active { background: var(--surface-hover); }
-  #season-options li[aria-selected='true']::after { content: ''; width: 5px; height: 9px; margin-right: 3px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-1px) rotate(45deg); }
-  .season-chevron { position: absolute; right: 9px; top: 50%; width: 12px; height: 12px; transform: translateY(-50%); color: var(--text); pointer-events: none; }
-  .skip-link:not(:focus) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-  .skip-link:focus { position: fixed; top: 12px; left: 12px; z-index: 10; padding: 12px 18px; background: var(--page); }
-  @media (max-width: 800px) {
-    .shell { padding: 0 24px; }
-    .header { flex-wrap: wrap; }
-  }
-  @media (max-width: 560px) {
-    .shell { padding: 0 18px; }
-    .header { flex-wrap: wrap; gap: 12px; padding-block: 18px; }
-    .header-controls { width: 100%; }
-    nav { flex: 1; }
-    nav a { flex: 1; padding-inline: 12px; }
-    footer { align-items: flex-start; flex-direction: column; gap: 16px; padding-block: 96px; }
-    .footer-links { gap: 20px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    :global(html) { scroll-behavior: auto; }
-    .theme-toggle:active { transform: none; }
-    .home-link .wordmark, .theme-flip svg { animation: none; }
-    nav a { transition: none; }
-  }
+  @media (min-width:1600px) { .page-width { width:1280px; } }
+  @media (max-width:1100px) { .page-width { width:calc(100% - 64px); } }
+  @media (max-width:760px) { .page-width { width:calc(100% - 40px); } }
+  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
 </style>

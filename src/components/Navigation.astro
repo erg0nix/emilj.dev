@@ -1,0 +1,64 @@
+---
+import Icon from './Icon.astro';
+
+const seasonOptions = [
+  ['auto', 'Automatic'],
+  ['winter', 'Winter'],
+  ['spring', 'Spring'],
+  ['summer', 'Summer'],
+  ['autumn', 'Autumn'],
+];
+---
+
+<div class="navigation">
+  <nav aria-label="Main navigation">
+    <a class="home-link" href="/" aria-label="Home" title="Home"><Icon name="home" /></a>
+    <a href="/#projects">Projects</a>
+    <a href="/#notes">Notes</a>
+  </nav>
+  <details class="season-picker" hidden>
+    <summary aria-label="Season: Automatic" title="Season: Automatic"><Icon name="auto" /></summary>
+    <div class="season-options" role="group" aria-label="Season">
+      {seasonOptions.map(([value, label]) => (
+        <button type="button" data-season-choice={value} aria-label={label} title={label} aria-pressed={value === 'auto'}>
+          <Icon name={value} />
+        </button>
+      ))}
+    </div>
+  </details>
+  <button id="theme" class="theme-toggle" type="button" role="switch" aria-label="Dark mode" aria-checked="true" hidden>
+    <svg class="sun" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" />
+    </svg>
+    <svg class="moon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20.5 13a8.5 8.5 0 0 1-9.5-9.5A8.5 8.5 0 1 0 20.5 13Z" />
+    </svg>
+  </button>
+</div>
+
+<style>
+  .navigation { display:flex; align-items:center; gap:4px; border:1px solid var(--line); padding:4px; border-radius:12px; background:var(--bg); }
+  nav { display:flex; align-items:center; gap:4px; }
+  nav a { display:flex; align-items:center; justify-content:center; min-height:44px; padding:0 16px; border-radius:8px; color:var(--text); text-decoration:none; font-size:14px; font-weight:500; }
+  nav .home-link { width:44px; flex:none; padding:12px; }
+  .home-link :global(svg) { width:20px; height:20px; }
+  .theme-toggle { width:44px; height:44px; flex:none; border-radius:8px; padding:13px; display:grid; place-items:center; }
+  .theme-toggle svg { width:18px; height:18px; }
+  nav a:hover, .theme-toggle:hover { background:var(--raised); }
+  .theme-toggle[aria-checked='true'] .moon, .theme-toggle[aria-checked='false'] .sun { display:none; }
+  .season-picker { position:relative; flex:none; }
+  .season-picker summary, .season-options button { display:grid; place-items:center; width:44px; height:44px; padding:12px; border-radius:8px; cursor:pointer; color:var(--muted); }
+  .season-picker summary { list-style:none; }
+  .season-picker summary::-webkit-details-marker { display:none; }
+  .season-picker :global(svg) { width:20px; height:20px; }
+  .season-picker summary:hover, .season-options button:hover { background:var(--raised); color:var(--text); }
+  .season-picker[open] summary, .season-options button[aria-pressed='true'] { color:var(--accent); background:var(--raised); }
+  .season-options { position:absolute; z-index:5; right:-42px; top:calc(100% + 12px); display:flex; gap:2px; padding:6px; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:0 8px 24px #0002; }
+
+  @media (max-width:560px) {
+    .navigation { width:100%; gap:2px; }
+    nav { flex:1; gap:2px; }
+    nav a { flex:1; padding-inline:8px; }
+  }
+</style>
