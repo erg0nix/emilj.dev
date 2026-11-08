@@ -38,9 +38,10 @@ const seasonOptions = [
 </div>
 
 <style>
-  .navigation { display:flex; align-items:center; gap:4px; width:100%; min-height:64px; border-bottom:1px solid var(--line); font-family:var(--mono); }
+  .navigation { position:relative; display:flex; align-items:center; gap:4px; width:100%; min-height:64px; border-bottom:1px solid var(--line); font-family:var(--mono); }
+  .navigation::after { content:''; position:absolute; bottom:-1px; left:0; width:44px; height:3px; background:var(--accent); }
   nav { display:flex; align-items:center; gap:20px; margin-right:auto; }
-  nav a { position:relative; display:flex; align-items:center; justify-content:center; min-height:44px; padding:0 4px; color:var(--muted); text-decoration:none; font-size:14px; font-weight:400; }
+  nav a { position:relative; display:flex; align-items:center; justify-content:center; min-height:44px; padding:0 4px; color:var(--muted); text-decoration:none; font-size:14px; font-weight:400; text-transform:uppercase; letter-spacing:.04em; }
   nav a::after { content:''; position:absolute; inset:auto 4px 4px; height:1px; background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform 160ms ease; }
   nav a:hover::after, nav a:focus-visible::after { transform:scaleX(1); }
   nav a:hover, nav a:focus-visible { color:var(--text); }
