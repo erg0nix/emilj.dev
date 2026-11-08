@@ -1,7 +1,6 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import PageFrame from '../components/PageFrame.astro';
-import Interests from '../components/Interests.astro';
 import Icon from '../components/Icon.astro';
 import { notes } from '../data/notes';
 import { projects } from '../data/projects';
@@ -22,7 +21,6 @@ import { projects } from '../data/projects';
         </div>
       </div>
     </section>
-    <div class="interest-strip"><Interests /></div>
     <div class="work-index">
       <section class="projects-section" id="projects" aria-labelledby="projects-title">
         <h2 id="projects-title">Projects</h2>
@@ -110,8 +108,6 @@ import { projects } from '../data/projects';
   .social-button:focus-visible { clip-path: none; }
   .social-button:hover { background: var(--yellow-hover); }
   .social-button :global(svg) { width: 18px; height: 18px; }
-
-  .interest-strip { border-bottom: 1px solid var(--line); }
 
   .projects-section,
   .notes-section {
