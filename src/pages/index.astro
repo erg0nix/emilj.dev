@@ -8,128 +8,275 @@ import { projects } from '../data/projects';
 ---
 
 <SiteLayout>
-  <section class="hero-field" aria-labelledby="intro-title">
-    <div class="page-width hero-content">
-      <div class="hero-navigation"><Navigation /></div>
-      <div class="introduction">
-        <h1 id="intro-title">Hi, I’m <span>Emil.</span></h1>
-        <div class="intro-bottom">
-          <p>I’m a software engineer in Oslo. I work mostly on backend systems, and spend some of my free time playing tennis, making tools, and experimenting with graphics and simulations.</p>
-          <div class="hero-socials" aria-label="Social links">
-            <a class="social-button" href="https://github.com/erg0nix"><Icon name="github" /><span>GitHub</span></a>
+  <div class="page-frame">
+    {['top-left', 'top-right', 'bottom-right'].map(corner => (
+      <svg class:list={['frame-join', corner]} viewBox="0 0 20 20" aria-hidden="true" fill="none">
+        <path d="M0 20 20 0" />
+      </svg>
+    ))}
+    <div class="page-content">
+      <div class="page-navigation"><Navigation /></div>
+      <section class="hero-field" aria-labelledby="intro-title">
+        <div class="introduction">
+          <h1 id="intro-title">Hi, I’m <span>Emil.</span></h1>
+          <div class="intro-bottom">
+            <p>I’m a software engineer in Oslo. I work mostly on backend systems, and spend some of my free time playing tennis, making tools, and experimenting with graphics and simulations.</p>
+            <div class="hero-socials" aria-label="Social links">
+              <a class="social-button" href="https://github.com/erg0nix">
+                <Icon name="github" /><span>GitHub</span>
+              </a>
+            </div>
           </div>
         </div>
+      </section>
+      <div class="interest-strip"><Interests /></div>
+      <div class="work-index">
+        <section class="projects-section" id="projects" aria-labelledby="projects-title">
+          <h2 id="projects-title">Projects</h2>
+          <ol class="project-rows">
+            {projects.map(project => (
+              <li>
+                <a class="project-row" href={project.href}>
+                  <span class="row-symbol"><Icon name={project.name} /></span>
+                  <div class="row-copy">
+                    <div class="row-name"><h3>{project.name}</h3><span>{project.detail}</span></div>
+                    <p>{project.description}</p>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <section class="notes-section" id="notes" aria-labelledby="notes-title">
+          <h2 id="notes-title">Notes</h2>
+          <ol class="note-entries">
+            {notes.map(note => (
+              <li class="note-entry">
+                <a href={`/notes/${note.slug}/`}>
+                  <span class="row-symbol"><Icon name="note" /></span>
+                  <div class="row-copy">
+                    <h3>{note.title}</h3>
+                    <time datetime={note.date}>{note.label}</time>
+                    <p>{note.summary}</p>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
       </div>
     </div>
-  </section>
-  <div class="interest-strip">
-    <div class="page-width">
-      <Interests />
-    </div>
-  </div>
-  <div class="work-index page-width">
-    <section class="projects-section" id="projects" aria-labelledby="projects-title">
-      <h2 id="projects-title">Projects</h2>
-      <ol class="project-rows">
-        {projects.map(project => (
-          <li>
-            <a class="project-row" href={project.href}>
-              <span class="row-symbol"><Icon name={project.name} /></span>
-              <div class="row-name"><h3>{project.name}</h3><span>{project.detail}</span></div>
-              <p>{project.description}</p>
-            </a>
-          </li>
-        ))}
-      </ol>
-    </section>
-    <section class="notes-section" id="notes" aria-labelledby="notes-title">
-      <h2 id="notes-title">Notes</h2>
-      <ol class="note-entries">
-        {notes.map(note => (
-          <li class="note-entry">
-            <a href={`/notes/${note.slug}/`}>
-              <span class="row-symbol"><Icon name="note" /></span>
-              <h3>{note.title}</h3>
-              <time datetime={note.date}>{note.label}</time>
-              <p>{note.summary}</p>
-            </a>
-          </li>
-        ))}
-      </ol>
-    </section>
   </div>
 </SiteLayout>
 
 <style>
-  .hero-field { position:relative; isolation:isolate; display:grid; min-height:560px; overflow:hidden; }
-  .hero-navigation { position:absolute; top:16px; left:0; right:0; z-index:2; pointer-events:auto; }
-  .hero-content { position:relative; z-index:1; display:grid; grid-template-columns:minmax(0,1fr); align-content:center; padding-block:130px 90px; }
-  .introduction { position:relative; width:fit-content; max-width:100%; }
-  h1 { font-size:clamp(56px,6.8vw,98px); line-height:.98; font-weight:400; letter-spacing:-.065em; margin:0; }
-  h1 span { color:var(--accent); }
-  .intro-bottom { margin-top:32px; }
-  .intro-bottom p { max-width:43ch; margin:0; color:var(--muted); font-size:14px; line-height:1.8; }
-  .hero-socials { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
-  .social-button { position:relative; display:inline-flex; align-items:center; gap:12px; min-height:44px; padding:9px 22px 9px 16px; color:#17180e; background:#f1db4b; clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%); text-decoration:none; font-family:var(--mono); transition:background 160ms ease; }
-  .social-button:focus-visible { clip-path:none; }
-  .social-button :global(svg) { width:18px; height:18px; }
-  .social-button:hover { background:#f9e878; }
-  .interest-strip { border-block:1px solid var(--line); }
-  .interest-strip .page-width { display:flex; align-items:center; min-height:56px; }
+  .page-frame {
+    --depth: 20px;
+    --section-label: 25%;
+    position: relative;
+    isolation: isolate;
+    width: min(1120px, calc(100% - 112px));
+    margin: 64px auto 80px;
+  }
 
-  .work-index { padding-bottom:64px; }
-  .projects-section, .notes-section { display:grid; grid-template-columns:144px minmax(0,1fr); column-gap:40px; padding-block:32px; }
-  .notes-section { border-top:1px solid var(--line); }
-  h2 { display:flex; align-items:center; gap:12px; align-self:start; margin:12px 0 0; font:400 14px/1.6 var(--mono); color:var(--text); }
-  h2::before { content:''; width:5px; height:5px; flex:none; border:1px solid var(--accent); }
-  .project-rows { display:grid; gap:2px; list-style:none; padding:0; margin:0 -12px; max-width:864px; }
-  .project-row, .note-entry { --item-highlight:var(--surface); background:transparent; border-radius:4px; transition:background 160ms ease; }
-  :global(:root[data-theme='light']) .project-row, :global(:root[data-theme='light']) .note-entry { --item-highlight:var(--raised); }
-  .project-row:hover, .project-row:focus-visible, .note-entry:hover, .note-entry:focus-within { background:var(--item-highlight); }
-  .project-row { display:grid; grid-template-columns:18px max-content minmax(0,1fr); align-items:baseline; gap:4px 14px; min-height:44px; padding:12px; color:var(--text); text-decoration:none; }
-  .project-row:focus-visible { outline-offset:3px; }
-  .row-symbol { display:grid; place-items:center; align-self:start; padding-top:2px; color:var(--muted); }
-  .row-symbol :global(svg) { width:18px; height:18px; }
-  .row-name { display:flex; align-items:baseline; gap:14px; }
-  .row-name h3 { margin:0; color:var(--accent); font:400 14px/1.6 var(--mono); }
-  .row-name span { color:var(--subtle); white-space:nowrap; font-size:14px; }
-  .project-row p { margin:0; color:var(--muted); line-height:1.6; }
-  .note-entries { display:grid; gap:2px; list-style:none; padding:0; margin:0 -12px; max-width:720px; }
-  .note-entry h3 { margin:0; font:400 14px/1.6 var(--mono); }
-  .note-entry a { display:grid; grid-template-columns:18px max-content max-content minmax(0,1fr); align-items:baseline; gap:4px 14px; padding:12px; border-radius:inherit; color:var(--accent); text-decoration:none; }
-  .note-entry time { color:var(--subtle); white-space:nowrap; font-variant-numeric:tabular-nums; }
-  .note-entry p { margin:0; color:var(--muted); }
+  .page-frame::before,
+  .page-frame::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    border: 1px solid var(--line);
+  }
 
-  @media (min-width:1600px) {
-    .hero-field { min-height:600px; }
+  .page-frame::before {
+    inset: calc(-1 * var(--depth)) calc(-1 * var(--depth)) var(--depth) var(--depth);
   }
-  @media (max-width:1100px) {
-    .projects-section, .notes-section { grid-template-columns:110px minmax(0,1fr); column-gap:24px; }
-    .project-row { grid-template-columns:18px minmax(0,1fr); }
-    .row-name, .project-row p { grid-column:2; }
-    .row-symbol { grid-column:1; grid-row:1; }
+
+  .page-frame::after {
+    inset: calc(var(--depth) / -2) calc(var(--depth) / -2) calc(var(--depth) / 2) calc(var(--depth) / 2);
   }
-  @media (max-width:760px) {
-    .hero-field { min-height:0; }
-    .hero-navigation { top:8px; }
-    .hero-content { padding-block:130px 64px; }
-    h1 { font-size:clamp(46px,8vw,64px); }
-    .intro-bottom { margin-top:25px; }
-    .work-index { padding-bottom:32px; }
-    .projects-section, .notes-section { grid-template-columns:minmax(0,1fr); gap:16px; padding-block:24px; }
-    h2 { margin:0; }
-    .project-row { gap:4px 12px; }
-    .row-name { flex-wrap:wrap; gap:4px 12px; }
-    .note-entry a { column-gap:12px; }
+
+  .frame-join {
+    position: absolute;
+    z-index: 2;
+    width: var(--depth);
+    height: var(--depth);
+    stroke: var(--line);
+    pointer-events: none;
   }
-  @media (max-width:560px) {
-    .intro-bottom p { max-width:34ch; }
-    .hero-socials { margin-top:18px; }
-    .note-entry a { grid-template-columns:18px max-content minmax(0,1fr); }
-    .note-entry p { grid-column:2 / -1; grid-row:2; }
-    .note-entry time { grid-column:3; grid-row:1; }
+
+  .top-left { top: calc(-1 * var(--depth)); left: 0; }
+  .top-right { top: calc(-1 * var(--depth)); right: calc(-1 * var(--depth)); }
+  .bottom-right { bottom: 0; right: calc(-1 * var(--depth)); }
+
+  .page-content {
+    position: relative;
+    z-index: 1;
+    background: var(--bg);
+    border: 1px solid var(--line);
   }
-  @media (prefers-reduced-motion:reduce) {
-    .social-button, .project-row, .note-entry { transition:none; }
+
+  .introduction {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1 {
+    align-content: center;
+    margin: 0;
+    padding: 56px 40px;
+    font-size: clamp(52px, 6vw, 80px);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -.055em;
+  }
+
+  h1 span { display: block; color: var(--accent); }
+
+  .intro-bottom {
+    align-content: center;
+    padding: 56px 40px;
+    border-left: 1px solid var(--line);
+  }
+
+  .intro-bottom p {
+    max-width: 48ch;
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .hero-socials { margin-top: 24px; }
+
+  .social-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 24px 10px 16px;
+    background: #f1db4b;
+    color: #17180e;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 160ms ease;
+  }
+
+  .social-button:focus-visible { clip-path: none; }
+  .social-button:hover { background: #f9e878; }
+  .social-button :global(svg) { width: 18px; height: 18px; }
+
+  .interest-strip { border-bottom: 1px solid var(--line); }
+
+  .projects-section,
+  .notes-section {
+    display: grid;
+    grid-template-columns: var(--section-label) minmax(0, 1fr);
+  }
+
+  .notes-section { border-top: 1px solid var(--line); }
+
+  h2 {
+    margin: 0;
+    padding: 32px 40px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  h2::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 14px;
+    margin-right: 12px;
+    vertical-align: -2px;
+    background: var(--accent);
+  }
+
+  .project-rows,
+  .note-entries {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 20px;
+    border-left: 1px solid var(--line);
+    list-style: none;
+  }
+
+  .project-row,
+  .note-entry a {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 4px 12px;
+    padding: 10px 12px;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: background 160ms ease;
+  }
+
+  .project-row:hover,
+  .project-row:focus-visible,
+  .note-entry a:hover,
+  .note-entry a:focus-visible { background: var(--surface); }
+
+  .row-symbol {
+    display: grid;
+    place-items: center;
+    align-self: start;
+    padding-top: 2px;
+    color: var(--subtle);
+  }
+
+  .row-symbol :global(svg) { width: 18px; height: 18px; }
+
+  .row-name { display: inline; }
+
+  .row-name h3,
+  .note-entry h3 {
+    display: inline;
+    margin: 0;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .row-name span,
+  .note-entry time { margin-inline: 12px; color: var(--subtle); }
+
+  .project-row p,
+  .note-entry p {
+    display: inline;
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .note-entry time { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 760px) {
+    .page-frame {
+      --depth: 10px;
+      width: calc(100% - 48px);
+      margin-block: 32px 48px;
+    }
+
+    .introduction { grid-template-columns: minmax(0, 1fr); }
+    h1 { padding: 36px 24px 24px; font-size: 56px; }
+    h1 span { display: inline; }
+    .intro-bottom { padding: 0 24px 36px; border-left: 0; }
+    .projects-section, .notes-section { grid-template-columns: minmax(0, 1fr); }
+    h2 { padding: 24px 24px 12px; }
+    .project-rows, .note-entries { border-left: 0; padding: 0 12px 20px; }
+  }
+
+  @media (max-width: 380px) {
+    h1 { font-size: 48px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .social-button, .project-row, .note-entry a { transition: none; }
   }
 </style>
