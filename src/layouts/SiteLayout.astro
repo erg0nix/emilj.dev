@@ -10,7 +10,7 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" data-theme="dark" data-season="autumn">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -21,14 +21,10 @@ const {
     <script is:inline>
       (() => {
         const root = document.documentElement;
-        const seasons = ['winter', 'spring', 'summer', 'autumn'];
         let theme = 'dark';
-        let seasonChoice = 'auto';
         try {
           const savedTheme = localStorage.getItem('theme');
-          const savedSeason = localStorage.getItem('season');
           if (['light', 'dark'].includes(savedTheme)) theme = savedTheme;
-          if (seasons.includes(savedSeason)) seasonChoice = savedSeason;
         } catch {
           // Defaults remain available when storage is blocked.
         }
@@ -43,39 +39,12 @@ const {
           document.dispatchEvent(new Event('themechange'));
         }
 
-        function updateSeason() {
-          const month = new Date().getMonth();
-          root.dataset.season = seasonChoice === 'auto'
-            ? seasons[Math.floor(((month + 1) % 12) / 3)]
-            : seasonChoice;
-
-          const summary = document.querySelector('.season-picker summary');
-          if (summary) {
-            for (const button of document.querySelectorAll('[data-season-choice]')) {
-              const selected = button.dataset.seasonChoice === seasonChoice;
-              button.setAttribute('aria-pressed', String(selected));
-              if (selected) {
-                summary.replaceChildren(button.querySelector('svg').cloneNode(true));
-                const label = 'Season: ' + button.getAttribute('aria-label');
-                summary.setAttribute('aria-label', label);
-                summary.title = label;
-              }
-            }
-          }
-          document.dispatchEvent(new Event('seasonchange'));
-        }
-
         updateTheme();
-        updateSeason();
 
         document.addEventListener('DOMContentLoaded', () => {
           const themeButton = document.getElementById('theme');
-          const picker = document.querySelector('.season-picker');
-          const summary = picker.querySelector('summary');
           updateTheme();
-          updateSeason();
           themeButton.hidden = false;
-          picker.hidden = false;
 
           themeButton.addEventListener('click', () => {
             theme = theme === 'dark' ? 'light' : 'dark';
@@ -85,37 +54,6 @@ const {
             } catch {
               // The current page still reflects the selection.
             }
-          });
-
-          for (const button of picker.querySelectorAll('[data-season-choice]')) {
-            button.addEventListener('click', () => {
-              seasonChoice = button.dataset.seasonChoice;
-              updateSeason();
-              picker.open = false;
-              summary.focus();
-              try {
-                if (seasonChoice === 'auto') localStorage.removeItem('season');
-                else localStorage.setItem('season', seasonChoice);
-              } catch {
-                // The current page still reflects the selection.
-              }
-            });
-          }
-
-          document.addEventListener('pointerdown', event => {
-            if (!picker.contains(event.target)) picker.open = false;
-          });
-          picker.addEventListener('keydown', event => {
-            if (event.key === 'Escape') {
-              picker.open = false;
-              summary.focus();
-            }
-          });
-          picker.addEventListener('focusout', event => {
-            if (!picker.contains(event.relatedTarget)) picker.open = false;
-          });
-          document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && seasonChoice === 'auto') updateSeason();
           });
         });
       })();
@@ -139,8 +77,11 @@ const {
     --subtle: #8e999e;
     --line: #394246;
     --fine: #242c2f;
-    --accent: #e79c60;
-    --art: 225,140,73;
+    --yellow: #f1db4b;
+    --yellow-hover: #f9e878;
+    --on-yellow: #17180e;
+    --accent: var(--yellow);
+    --art: 241,219,75;
   }
   :root[data-theme='light'] {
     color-scheme: light;
@@ -153,15 +94,9 @@ const {
     --subtle: #5b686e;
     --line: #aeb8b2;
     --fine: #d0d7cf;
-    --accent: #99501b;
-    --art: 165,91,37;
+    --accent: #756000;
+    --art: 117,96,0;
   }
-  :root[data-season='winter'] { --accent:#9cc9e5; --art:139,192,224; }
-  :root[data-season='spring'] { --accent:#dba7bc; --art:212,158,182; }
-  :root[data-season='summer'] { --accent:#dbc37e; --art:213,184,105; }
-  :root[data-season='winter'][data-theme='light'] { --accent:#28628b; --art:50,106,143; }
-  :root[data-season='spring'][data-theme='light'] { --accent:#954164; --art:145,76,109; }
-  :root[data-season='summer'][data-theme='light'] { --accent:#796019; --art:130,105,42; }
   * { box-sizing:border-box; }
   html { scroll-behavior:smooth; scroll-padding-top:32px; }
   body { margin:0; background:var(--canvas); color:var(--text); font:14px/1.6 Arial,Helvetica,sans-serif; -webkit-font-smoothing:antialiased; }

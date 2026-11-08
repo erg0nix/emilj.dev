@@ -154,8 +154,8 @@ import { projects } from '../data/projects';
     gap: 12px;
     min-height: 44px;
     padding: 10px 24px 10px 16px;
-    background: #f1db4b;
-    color: #17180e;
+    background: var(--yellow);
+    color: var(--on-yellow);
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
     text-decoration: none;
     font-weight: 500;
@@ -163,7 +163,7 @@ import { projects } from '../data/projects';
   }
 
   .social-button:focus-visible { clip-path: none; }
-  .social-button:hover { background: #f9e878; }
+  .social-button:hover { background: var(--yellow-hover); }
   .social-button :global(svg) { width: 18px; height: 18px; }
 
   .interest-strip { border-bottom: 1px solid var(--line); }
