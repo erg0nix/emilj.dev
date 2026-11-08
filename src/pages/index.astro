@@ -1,6 +1,6 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
-import Navigation from '../components/Navigation.astro';
+import PageFrame from '../components/PageFrame.astro';
 import Interests from '../components/Interests.astro';
 import Icon from '../components/Icon.astro';
 import { notes } from '../data/notes';
@@ -8,113 +8,58 @@ import { projects } from '../data/projects';
 ---
 
 <SiteLayout>
-  <div class="page-frame">
-    {['top-left', 'top-right', 'bottom-right'].map(corner => (
-      <svg class:list={['frame-join', corner]} viewBox="0 0 20 20" aria-hidden="true" fill="none">
-        <path d="M0 20 20 0" />
-      </svg>
-    ))}
-    <div class="page-content">
-      <div class="page-navigation"><Navigation /></div>
-      <section class="hero-field" aria-labelledby="intro-title">
-        <div class="introduction">
-          <h1 id="intro-title">Hi, I’m <span>Emil.</span></h1>
-          <div class="intro-bottom">
-            <p>I’m a software engineer in Oslo. I work mostly on backend systems, and spend some of my free time playing tennis, making tools, and experimenting with graphics and simulations.</p>
-            <div class="hero-socials" aria-label="Social links">
-              <a class="social-button" href="https://github.com/erg0nix">
-                <Icon name="github" /><span>GitHub</span>
-              </a>
-            </div>
+  <PageFrame>
+    <section class="hero-field" aria-labelledby="intro-title">
+      <div class="introduction">
+        <h1 id="intro-title">Hi, I’m <span>Emil.</span></h1>
+        <div class="intro-bottom">
+          <p>I’m a software engineer in Oslo. I work mostly on backend systems, and spend some of my free time playing tennis, making tools, and experimenting with graphics and simulations.</p>
+          <div class="hero-socials" aria-label="Social links">
+            <a class="social-button" href="https://github.com/erg0nix">
+              <Icon name="github" /><span>GitHub</span>
+            </a>
           </div>
         </div>
-      </section>
-      <div class="interest-strip"><Interests /></div>
-      <div class="work-index">
-        <section class="projects-section" id="projects" aria-labelledby="projects-title">
-          <h2 id="projects-title">Projects</h2>
-          <ol class="project-rows">
-            {projects.map(project => (
-              <li>
-                <a class="project-row" href={project.href}>
-                  <span class="row-symbol"><Icon name={project.name} /></span>
-                  <div class="row-copy">
-                    <div class="row-name"><h3>{project.name}</h3><span>{project.detail}</span></div>
-                    <p>{project.description}</p>
-                  </div>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </section>
-        <section class="notes-section" id="notes" aria-labelledby="notes-title">
-          <h2 id="notes-title">Notes</h2>
-          <ol class="note-entries">
-            {notes.map(note => (
-              <li class="note-entry">
-                <a href={`/notes/${note.slug}/`}>
-                  <span class="row-symbol"><Icon name="note" /></span>
-                  <div class="row-copy">
-                    <h3>{note.title}</h3>
-                    <time datetime={note.date}>{note.label}</time>
-                    <p>{note.summary}</p>
-                  </div>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </section>
       </div>
+    </section>
+    <div class="interest-strip"><Interests /></div>
+    <div class="work-index">
+      <section class="projects-section" id="projects" aria-labelledby="projects-title">
+        <h2 id="projects-title">Projects</h2>
+        <ol class="project-rows">
+          {projects.map(project => (
+            <li>
+              <a class="project-row" href={project.href}>
+                <span class="row-symbol"><Icon name={project.name} /></span>
+                <div class="row-heading"><h3>{project.name}</h3><span>{project.detail}</span></div>
+                <p>{project.description}</p>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section class="notes-section" id="notes" aria-labelledby="notes-title">
+        <h2 id="notes-title">Notes</h2>
+        <ol class="note-entries">
+          {notes.map(note => (
+            <li class="note-entry">
+              <a href={`/notes/${note.slug}/`}>
+                <span class="row-symbol"><Icon name="note" /></span>
+                <div class="row-heading">
+                  <h3>{note.title}</h3>
+                  <time datetime={note.date}>{note.label}</time>
+                </div>
+                <p>{note.summary}</p>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
-  </div>
+  </PageFrame>
 </SiteLayout>
 
 <style>
-  .page-frame {
-    --depth: 20px;
-    --section-label: 25%;
-    position: relative;
-    isolation: isolate;
-    width: min(1120px, calc(100% - 112px));
-    margin: 64px auto 80px;
-  }
-
-  .page-frame::before,
-  .page-frame::after {
-    content: '';
-    position: absolute;
-    pointer-events: none;
-    border: 1px solid var(--line);
-  }
-
-  .page-frame::before {
-    inset: calc(-1 * var(--depth)) calc(-1 * var(--depth)) var(--depth) var(--depth);
-  }
-
-  .page-frame::after {
-    inset: calc(var(--depth) / -2) calc(var(--depth) / -2) calc(var(--depth) / 2) calc(var(--depth) / 2);
-  }
-
-  .frame-join {
-    position: absolute;
-    z-index: 2;
-    width: var(--depth);
-    height: var(--depth);
-    stroke: var(--line);
-    pointer-events: none;
-  }
-
-  .top-left { top: calc(-1 * var(--depth)); left: 0; }
-  .top-right { top: calc(-1 * var(--depth)); right: calc(-1 * var(--depth)); }
-  .bottom-right { bottom: 0; right: calc(-1 * var(--depth)); }
-
-  .page-content {
-    position: relative;
-    z-index: 1;
-    background: var(--bg);
-    border: 1px solid var(--line);
-  }
-
   .introduction {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -207,7 +152,7 @@ import { projects } from '../data/projects';
   .project-row,
   .note-entry a {
     display: grid;
-    grid-template-columns: 18px minmax(0, 1fr);
+    grid-template-columns: 18px 104px 112px minmax(0, 1fr);
     align-items: baseline;
     gap: 4px 12px;
     padding: 10px 12px;
@@ -231,11 +176,10 @@ import { projects } from '../data/projects';
 
   .row-symbol :global(svg) { width: 18px; height: 18px; }
 
-  .row-name { display: inline; }
+  .row-heading { display: contents; }
 
-  .row-name h3,
+  .project-row h3,
   .note-entry h3 {
-    display: inline;
     margin: 0;
     color: var(--accent);
     font-size: 14px;
@@ -243,12 +187,11 @@ import { projects } from '../data/projects';
     line-height: 1.6;
   }
 
-  .row-name span,
-  .note-entry time { margin-inline: 12px; color: var(--subtle); }
+  .row-heading span,
+  .note-entry time { color: var(--subtle); }
 
   .project-row p,
   .note-entry p {
-    display: inline;
     margin: 0;
     color: var(--muted);
     line-height: 1.6;
@@ -256,13 +199,18 @@ import { projects } from '../data/projects';
 
   .note-entry time { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-  @media (max-width: 760px) {
-    .page-frame {
-      --depth: 10px;
-      width: calc(100% - 48px);
-      margin-block: 32px 48px;
+  @media (max-width: 1000px) {
+    .project-row, .note-entry a { grid-template-columns: 18px minmax(0, 1fr); }
+    .row-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px 12px;
     }
+    .project-row p, .note-entry p { grid-column: 2; }
+  }
 
+  @media (max-width: 760px) {
     .introduction { grid-template-columns: minmax(0, 1fr); }
     h1 { padding: 36px 24px 24px; font-size: 56px; }
     h1 span { display: inline; }
