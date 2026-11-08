@@ -21,12 +21,12 @@ const interests = ['Local-first software', 'Backend systems', 'Game development'
 </script>
 
 <style>
-  .interest-marquee { display:flex; align-items:center; min-width:0; width:100%; min-height:60px; }
+  .interest-marquee { display:flex; align-items:center; min-width:0; width:100%; min-height:56px; font-family:var(--mono); }
   .marquee-window { overflow:hidden; min-width:0; flex:1; mask-image:linear-gradient(to right, transparent, #000 16px, #000 calc(100% - 16px), transparent); }
   .marquee-track { display:flex; width:max-content; animation:interests-scroll 72s linear infinite; }
   .marquee-group { display:flex; flex-shrink:0; align-items:center; gap:32px; list-style:none; margin:0; padding:0 32px 0 0; }
   .marquee-group li { display:flex; align-items:center; gap:32px; white-space:nowrap; color:var(--muted); font-size:14px; }
-  .marquee-group li::after { content:''; width:3px; height:3px; background:var(--subtle); }
+  .marquee-group li::after { content:''; width:4px; height:4px; border:1px solid var(--subtle); transform:rotate(45deg); }
   [data-offscreen='true'] .marquee-track, [data-hidden='true'] .marquee-track { animation-play-state:paused; }
   @media (hover:hover) { .interest-marquee:hover .marquee-track { animation-play-state:paused; } }
   @keyframes interests-scroll { to { transform:translateX(-50%); } }
