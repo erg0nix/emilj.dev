@@ -1,6 +1,7 @@
 ---
 import SiteLayout from '../layouts/SiteLayout.astro';
 import PageFrame from '../components/PageFrame.astro';
+import DailyTarot from '../components/DailyTarot.astro';
 import Icon from '../components/Icon.astro';
 import { notes } from '../data/notes';
 import { projects } from '../data/projects';
@@ -21,6 +22,7 @@ import { projects } from '../data/projects';
         </div>
       </div>
     </section>
+    <DailyTarot />
     <div class="work-index">
       <section class="projects-section" id="projects" aria-labelledby="projects-title">
         <h2 id="projects-title">Projects</h2>

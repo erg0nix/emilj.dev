@@ -1,0 +1,96 @@
+{
+  "artist": "Pamela Colman Smith",
+  "deck": "Rider–Waite–Smith, Major Arcana",
+  "license": "Public domain",
+  "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+  "images": [
+    {
+      "file": "00.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_00_Fool.jpg"
+    },
+    {
+      "file": "01.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_01_Magician.jpg"
+    },
+    {
+      "file": "02.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_02_High_Priestess.jpg"
+    },
+    {
+      "file": "03.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_03_Empress.jpg"
+    },
+    {
+      "file": "04.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_04_Emperor.jpg"
+    },
+    {
+      "file": "05.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_05_Hierophant.jpg"
+    },
+    {
+      "file": "06.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_06_Lovers.jpg"
+    },
+    {
+      "file": "07.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_07_Chariot.jpg"
+    },
+    {
+      "file": "08.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_08_Strength.jpg"
+    },
+    {
+      "file": "09.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_09_Hermit.jpg"
+    },
+    {
+      "file": "10.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_10_Wheel_of_Fortune.jpg"
+    },
+    {
+      "file": "11.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_11_Justice.jpg"
+    },
+    {
+      "file": "12.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_12_Hanged_Man.jpg"
+    },
+    {
+      "file": "13.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_13_Death.jpg"
+    },
+    {
+      "file": "14.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_14_Temperance.jpg"
+    },
+    {
+      "file": "15.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_15_Devil.jpg"
+    },
+    {
+      "file": "16.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_16_Tower.jpg"
+    },
+    {
+      "file": "17.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_17_Star.jpg"
+    },
+    {
+      "file": "18.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_18_Moon.jpg"
+    },
+    {
+      "file": "19.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_19_Sun.jpg"
+    },
+    {
+      "file": "20.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_20_Judgement.jpg"
+    },
+    {
+      "file": "21.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:RWS_Tarot_21_World.jpg"
+    }
+  ]
+}
