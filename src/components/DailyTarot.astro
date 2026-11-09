@@ -1,0 +1,211 @@
+---
+import { tarotPositions } from '../data/tarot';
+---
+
+<section class="daily-tarot" aria-label="Daily tarot" data-tarot data-revealed="false">
+  <div class="tarot-display">
+    <div class="card-spread" role="group" aria-label="Tarot deck">
+      {tarotPositions.map((_, index) => (
+        <button
+          class="card-button"
+          type="button"
+          id={`tarot-card-${index}`}
+          aria-controls="tarot-reading"
+          aria-label="Draw today's three cards"
+          aria-hidden={index === 0 ? undefined : 'true'}
+          tabindex={index === 0 ? 0 : -1}
+          data-tarot-card={index}
+          style={`--deal-delay: ${index * 90}ms`}
+          disabled
+        >
+          <span class="card-picture" aria-hidden="true">
+            <span class="card-turn">
+              <span class="card-back">
+                <svg viewBox="0 0 180 300" fill="none">
+                  <rect x="8" y="8" width="164" height="284" rx="3" stroke="#7687a4" />
+                  <path d="M16 66V16h50M114 16h50v50M164 234v50h-50M66 284H16v-50" stroke="#eecb7b" />
+                  <path d="m90 36 58 114-58 114-58-114Z" stroke="#6dcac1" />
+                  <path d="M32 150h116M90 36v228" stroke="#6dcac1" opacity=".4" />
+                  <ellipse cx="90" cy="150" rx="57" ry="27" transform="rotate(-40 90 150)" stroke="#e681a9" />
+                  <ellipse cx="90" cy="150" rx="57" ry="27" transform="rotate(40 90 150)" stroke="#e681a9" />
+                  <circle cx="90" cy="150" r="31" fill="#eecb7b" />
+                  <path d="M96 120a31 31 0 0 1 0 60 33 33 0 0 0 0-60" fill="#19263a" />
+                  <path d="m90 58 3 8 8 3-8 3-3 8-3-8-8-3 8-3Zm0 162 3 8 8 3-8 3-3 8-3-8-8-3 8-3Z" fill="#eecb7b" />
+                  <circle cx="28" cy="32" r="2" fill="#6dcac1" /><circle cx="152" cy="268" r="2" fill="#6dcac1" />
+                </svg>
+              </span>
+              <span class="card-front"><img data-tarot-image width="330" height="554" alt="" /></span>
+            </span>
+          </span>
+        </button>
+      ))}
+    </div>
+    <div class="tarot-reading" id="tarot-reading" role="region" aria-label="Tarot reading" aria-hidden="true" aria-live="polite" aria-atomic="true" tabindex="0">
+      <h3 data-tarot-name></h3>
+      <p class="card-keywords" data-tarot-keywords></p>
+      <p class="card-meaning" data-tarot-meaning></p>
+      <p class="card-prompt" data-tarot-prompt></p>
+    </div>
+  </div>
+  <noscript><p class="no-script">Enable JavaScript to draw today's cards.</p></noscript>
+</section>
+
+<script>
+  import { dailyTarot } from '../data/tarot';
+
+  const panel = document.querySelector<HTMLElement>('[data-tarot]')!;
+  const name = panel.querySelector<HTMLElement>('[data-tarot-name]')!;
+  const keywords = panel.querySelector<HTMLElement>('[data-tarot-keywords]')!;
+  const meaning = panel.querySelector<HTMLElement>('[data-tarot-meaning]')!;
+  const prompt = panel.querySelector<HTMLElement>('[data-tarot-prompt]')!;
+  const reading = panel.querySelector<HTMLElement>('.tarot-reading')!;
+  const spread = panel.querySelector<HTMLElement>('.card-spread')!;
+  const cards = [...panel.querySelectorAll<HTMLButtonElement>('[data-tarot-card]')];
+  let draw: ReturnType<typeof dailyTarot>;
+  let revealed = false;
+  let selected = 0;
+  let timer: ReturnType<typeof setTimeout>;
+
+  function render() {
+    panel.dataset.revealed = String(revealed);
+    spread.setAttribute('role', revealed ? 'tablist' : 'group');
+    spread.setAttribute('aria-label', revealed ? "Today's tarot spread" : 'Tarot deck');
+    cards.forEach((button, index) => {
+      const card = draw.cards[index];
+      button.setAttribute('role', revealed ? 'tab' : 'button');
+      if (revealed) button.setAttribute('aria-selected', String(index === selected));
+      else button.removeAttribute('aria-selected');
+      button.disabled = !revealed && index !== 0;
+      button.setAttribute('aria-hidden', String(!revealed && index !== 0));
+      button.tabIndex = index === selected ? 0 : -1;
+      button.setAttribute('aria-label', revealed
+        ? card.position + ': ' + card.name + ', ' + (card.reversed ? 'reversed' : 'upright')
+        : "Draw today's three cards");
+    });
+    const card = draw.cards[selected];
+    name.textContent = card.name + (card.reversed ? ' · Reversed' : '');
+    keywords.textContent = card.meaning.keywords;
+    meaning.textContent = card.meaning.reading;
+    prompt.textContent = card.meaning.prompt;
+    reading.setAttribute('role', revealed ? 'tabpanel' : 'region');
+    reading.setAttribute('aria-hidden', String(!revealed));
+    if (revealed) reading.setAttribute('aria-labelledby', cards[selected].id);
+    else reading.removeAttribute('aria-labelledby');
+  }
+
+  function refreshDay() {
+    const next = dailyTarot(new Date());
+    if (draw?.day === next.day) return;
+    draw = next;
+    panel.dataset.day = draw.day;
+    selected = 0;
+    cards.forEach((button, index) => {
+      button.querySelector<HTMLImageElement>('[data-tarot-image]')!.src = draw.cards[index].image;
+      button.dataset.reversed = String(draw.cards[index].reversed);
+    });
+    revealed = false;
+    try {
+      revealed = localStorage.getItem('tarot-revealed') === draw.day;
+    } catch {
+      // Drawing still works when storage is unavailable.
+    }
+    render();
+  }
+
+  function scheduleDayCheck() {
+    clearTimeout(timer);
+    refreshDay();
+    if (!document.hidden) timer = setTimeout(scheduleDayCheck, 60000 - Date.now() % 60000);
+  }
+
+  cards.forEach((button, index) => {
+    button.addEventListener('click', () => {
+      refreshDay();
+      selected = revealed ? index : 0;
+      revealed = true;
+      render();
+      try {
+        localStorage.setItem('tarot-revealed', draw.day);
+      } catch {
+        // The current spread does not depend on persistence.
+      }
+    });
+    button.addEventListener('keydown', event => {
+      if (!revealed || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      refreshDay();
+      if (event.key === 'Home') selected = 0;
+      else if (event.key === 'End') selected = cards.length - 1;
+      else selected = (index + (event.key === 'ArrowRight' ? 1 : -1) + cards.length) % cards.length;
+      render();
+      cards[selected].focus();
+    });
+  });
+  document.addEventListener('visibilitychange', scheduleDayCheck);
+  window.addEventListener('pageshow', scheduleDayCheck);
+  window.addEventListener('pagehide', () => clearTimeout(timer));
+  scheduleDayCheck();
+  requestAnimationFrame(() => { panel.dataset.ready = 'true'; });
+</script>
+
+<style>
+  .daily-tarot { background: #141b2a; color: #edece5; border-bottom: 1px solid var(--line); }
+
+  .tarot-display {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    padding: 40px;
+    gap: 40px;
+    overflow: hidden;
+  }
+
+  .card-spread { --card-gap: 18px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--card-gap); }
+  .card-button { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; min-width: 0; width: 100%; padding: 8px 0; }
+  .card-picture { position: relative; display: block; width: 100%; max-width: 150px; aspect-ratio: 3 / 5; perspective: 900px; }
+  [data-revealed='true'] .card-button[aria-selected='true'] .card-picture { outline: 1px solid #9bd9d3; outline-offset: 5px; }
+  .card-turn { position: absolute; inset: 0; transform-style: preserve-3d; }
+  .card-back, .card-front { position: absolute; inset: 0; overflow: hidden; border-radius: 4px; backface-visibility: hidden; }
+  .card-back { background: #19263a; border: 1px solid #8394b1; }
+  .card-back svg { display: block; width: 100%; height: 100%; }
+  .card-front { transform: rotateY(180deg); background: #e5dcc5; }
+  .card-front img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  [data-reversed='true'] img { transform: rotate(180deg); }
+  [data-revealed='true'] .card-turn { transform: rotateY(180deg); }
+
+  [data-revealed='false'] .card-spread { transform: translateX(calc(50% + 20px)); }
+  [data-revealed='false'] .card-button:nth-child(1) { z-index: 3; transform: translateX(calc(100% + var(--card-gap))); }
+  [data-revealed='false'] .card-button:nth-child(2) { z-index: 2; transform: rotate(-7deg); }
+  [data-revealed='false'] .card-button:nth-child(3) { z-index: 1; transform: translateX(calc(-100% - var(--card-gap))) rotate(7deg); }
+  [data-revealed='false'] .card-picture { width: 150px; max-width: none; }
+  [data-revealed='false'] .tarot-reading { visibility: hidden; opacity: 0; pointer-events: none; }
+  [data-ready='true'] .card-spread, [data-ready='true'] .card-button { transition: transform 450ms cubic-bezier(.2,.65,.2,1); }
+  [data-ready='true'] .card-picture { transition: width 450ms ease; }
+  [data-ready='true'] .card-turn { transition: transform 600ms cubic-bezier(.2,.65,.2,1) calc(300ms + var(--deal-delay)); }
+  [data-ready='true'] .tarot-reading { transition: opacity 200ms ease 800ms; }
+  button:disabled { cursor: default; }
+  button:focus-visible, .tarot-reading:focus-visible { outline-color: var(--yellow); }
+
+  .tarot-reading { max-width: 48ch; }
+  h3 { margin: 0 0 12px; font-size: clamp(24px, 3vw, 32px); font-weight: 500; line-height: 1.2; letter-spacing: -.025em; }
+  .card-keywords { margin: 0 0 16px; color: #9bd9d3; }
+  .card-meaning { margin: 0; color: #c9cfdb; line-height: 1.8; }
+  .card-prompt { margin: 20px 0 0; padding-left: 16px; border-left: 2px solid #e681a9; line-height: 1.8; }
+  .no-script { margin: 0; padding: 0 24px 24px; text-align: center; color: #c9cfdb; }
+
+  @media (max-width: 760px) {
+    .tarot-display { grid-template-columns: minmax(0, 1fr); padding: 32px 24px; gap: 24px; }
+    .card-spread { --card-gap: 12px; }
+    .tarot-reading { width: 100%; }
+    [data-revealed='false'] .card-spread { transform: none; }
+    [data-revealed='false'] .tarot-reading { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-ready='true'] .card-spread,
+    [data-ready='true'] .card-button,
+    [data-ready='true'] .card-picture,
+    [data-ready='true'] .card-turn,
+    [data-ready='true'] .tarot-reading { transition: none; }
+  }
+</style>

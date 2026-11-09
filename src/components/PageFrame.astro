@@ -1,0 +1,70 @@
+---
+import Navigation from './Navigation.astro';
+---
+
+<div class="page-frame">
+  {['top-left', 'top-right', 'bottom-right'].map(corner => (
+    <svg class:list={['frame-join', corner]} viewBox="0 0 20 20" aria-hidden="true" fill="none">
+      <path d="M0 20 20 0" />
+    </svg>
+  ))}
+  <div class="page-content">
+    <Navigation />
+    <slot />
+  </div>
+</div>
+
+<style>
+  .page-frame {
+    --depth: 20px;
+    --section-label: 25%;
+    position: relative;
+    isolation: isolate;
+    width: min(1120px, calc(100% - 112px));
+    margin: 64px auto 80px;
+  }
+
+  .page-frame::before,
+  .page-frame::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    border: 1px solid var(--line);
+  }
+
+  .page-frame::before {
+    inset: calc(-1 * var(--depth)) calc(-1 * var(--depth)) var(--depth) var(--depth);
+  }
+
+  .page-frame::after {
+    inset: calc(var(--depth) / -2) calc(var(--depth) / -2) calc(var(--depth) / 2) calc(var(--depth) / 2);
+  }
+
+  .frame-join {
+    position: absolute;
+    z-index: 2;
+    width: var(--depth);
+    height: var(--depth);
+    stroke: var(--line);
+    pointer-events: none;
+  }
+
+  .top-left { top: calc(-1 * var(--depth)); left: 0; }
+  .top-right { top: calc(-1 * var(--depth)); right: calc(-1 * var(--depth)); }
+  .bottom-right { bottom: 0; right: calc(-1 * var(--depth)); }
+
+  .page-content {
+    position: relative;
+    z-index: 1;
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+
+  @media (max-width: 760px) {
+    .page-frame {
+      --depth: 10px;
+      width: calc(100% - 48px);
+      margin-block: 32px 48px;
+    }
+  }
+</style>
